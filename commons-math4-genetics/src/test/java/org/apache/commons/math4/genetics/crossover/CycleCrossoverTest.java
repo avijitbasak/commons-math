@@ -14,10 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.commons.math4.legacy.genetics;
+package org.apache.commons.math4.genetics.crossover;
 
-import org.apache.commons.math4.legacy.exception.DimensionMismatchException;
-import org.apache.commons.math4.legacy.exception.MathIllegalArgumentException;
+import org.apache.commons.math4.genetics.chromosome.ChromosomePair;
+import org.apache.commons.math4.genetics.dummy.DummyListChromosome;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -32,8 +32,8 @@ public class CycleCrossoverTest {
         final DummyListChromosome p1c = new DummyListChromosome(p1);
         final DummyListChromosome p2c = new DummyListChromosome(p2);
 
-        final CrossoverPolicy cp = new CycleCrossover<Integer>();
-        final ChromosomePair pair = cp.crossover(p1c, p2c);
+        final CrossoverPolicy<String> cp = new CycleCrossover<Integer, String>();
+        final ChromosomePair<String> pair = cp.crossover(p1c, p2c, 1.0);
 
         final Integer[] c1 = ((DummyListChromosome) pair.getFirst()).getRepresentation()
                 .toArray(new Integer[p1.length]);
@@ -55,8 +55,8 @@ public class CycleCrossoverTest {
         final DummyListChromosome p1c = new DummyListChromosome(p1);
         final DummyListChromosome p2c = new DummyListChromosome(p2);
 
-        final CrossoverPolicy cp = new CycleCrossover<Integer>();
-        final ChromosomePair pair = cp.crossover(p1c, p2c);
+        final CrossoverPolicy<String> cp = new CycleCrossover<Integer, String>();
+        final ChromosomePair<String> pair = cp.crossover(p1c, p2c, 1.0);
 
         final Integer[] c1 = ((DummyListChromosome) pair.getFirst()).getRepresentation()
                 .toArray(new Integer[p1.length]);
@@ -77,10 +77,10 @@ public class CycleCrossoverTest {
         final DummyListChromosome p1c = new DummyListChromosome(p1);
         final DummyListChromosome p2c = new DummyListChromosome(p2);
 
-        final CrossoverPolicy cp = new CycleCrossover<Integer>(true);
+        final CrossoverPolicy<String> cp = new CycleCrossover<Integer, String>(true);
 
         for (int i = 0; i < 20; i++) {
-            final ChromosomePair pair = cp.crossover(p1c, p2c);
+            final ChromosomePair<String> pair = cp.crossover(p1c, p2c, 1.0);
 
             final Integer[] c1 = ((DummyListChromosome) pair.getFirst()).getRepresentation()
                     .toArray(new Integer[p1.length]);
@@ -112,47 +112,4 @@ public class CycleCrossoverTest {
         }
     }
 
-    @Test(expected = DimensionMismatchException.class)
-    public void testCrossoverDimensionMismatchException() {
-        final Integer[] p1 = new Integer[] {1, 0, 1, 0, 0, 1, 0, 1, 1};
-        final Integer[] p2 = new Integer[] {0, 1, 1, 0, 1};
-
-        final BinaryChromosome p1c = new DummyBinaryChromosome(p1);
-        final BinaryChromosome p2c = new DummyBinaryChromosome(p2);
-
-        final CrossoverPolicy cp = new CycleCrossover<Integer>();
-        cp.crossover(p1c, p2c);
-    }
-
-    @Test(expected = MathIllegalArgumentException.class)
-    public void testCrossoverInvalidFixedLengthChromosomeFirst() {
-        final Integer[] p1 = new Integer[] {1, 0, 1, 0, 0, 1, 0, 1, 1};
-        final BinaryChromosome p1c = new DummyBinaryChromosome(p1);
-        final Chromosome p2c = new Chromosome() {
-            @Override
-            public double fitness() {
-                // Not important
-                return 0;
-            }
-        };
-
-        final CrossoverPolicy cp = new CycleCrossover<Integer>();
-        cp.crossover(p1c, p2c);
-    }
-
-    @Test(expected = MathIllegalArgumentException.class)
-    public void testCrossoverInvalidFixedLengthChromosomeSecond() {
-        final Integer[] p1 = new Integer[] {1, 0, 1, 0, 0, 1, 0, 1, 1};
-        final BinaryChromosome p2c = new DummyBinaryChromosome(p1);
-        final Chromosome p1c = new Chromosome() {
-            @Override
-            public double fitness() {
-                // Not important
-                return 0;
-            }
-        };
-
-        final CrossoverPolicy cp = new CycleCrossover<Integer>();
-        cp.crossover(p1c, p2c);
-    }
 }
