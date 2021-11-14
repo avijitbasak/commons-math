@@ -19,7 +19,7 @@ package org.apache.commons.math4.ga.mutation;
 import org.apache.commons.math4.ga.chromosome.Chromosome;
 import org.apache.commons.math4.ga.chromosome.IntegralValuedChromosome;
 import org.apache.commons.math4.ga.internal.exception.GeneticException;
-import org.apache.commons.math4.ga.utils.RandomNumberGenerator;
+import org.apache.commons.math4.ga.utils.RandomProviderManager;
 
 /**
  * Mutation for {@link IntegralValuedChromosome}. Randomly changes few genes.
@@ -70,7 +70,7 @@ public class IntegralValuedMutation<P> extends AbstractListChromosomeMutationPol
         if (!IntegralValuedChromosome.class.isAssignableFrom(original.getClass())) {
             throw new GeneticException(GeneticException.ILLEGAL_ARGUMENT, original.getClass().getSimpleName());
         }
-        IntegralValuedChromosome<P> chromosome = (IntegralValuedChromosome<P>) original;
+        final IntegralValuedChromosome<P> chromosome = (IntegralValuedChromosome<P>) original;
         if (chromosome.getMin() != this.min || chromosome.getMax() != this.max) {
             throw new GeneticException(GeneticException.ILLEGAL_RANGE, this.min, this.max, chromosome.getMin(),
                     chromosome.getMax());
@@ -82,7 +82,7 @@ public class IntegralValuedMutation<P> extends AbstractListChromosomeMutationPol
      */
     @Override
     protected Integer mutateGene(Integer originalValue) {
-        return min + RandomNumberGenerator.getRandomGenerator().nextInt(max - min);
+        return min + RandomProviderManager.getRandomProvider().nextInt(max - min);
     }
 
 }

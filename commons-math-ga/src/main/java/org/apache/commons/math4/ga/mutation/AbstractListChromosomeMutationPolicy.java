@@ -24,7 +24,8 @@ import java.util.Set;
 
 import org.apache.commons.math4.ga.chromosome.AbstractListChromosome;
 import org.apache.commons.math4.ga.chromosome.Chromosome;
-import org.apache.commons.math4.ga.utils.RandomNumberGenerator;
+import org.apache.commons.math4.ga.utils.RandomProviderManager;
+import org.apache.commons.rng.UniformRandomProvider;
 
 /**
  * This abstraction represents an abstract mutation policy for ListChromosomes.
@@ -75,15 +76,16 @@ public abstract class AbstractListChromosomeMutationPolicy<T, P> implements Muta
         // calculate the total mutation rate of all the alleles i.e. chromosome.
         final double chromosomeMutationRate = mutationRate * length;
         final Set<Integer> indexSet = new HashSet<>();
+        final UniformRandomProvider randomProvider = RandomProviderManager.getRandomProvider();
 
         // if chromosomeMutationRate >= 1 then more than one allele will be mutated.
         if (chromosomeMutationRate >= 1) {
             final int noOfMutation = (int) Math.round(chromosomeMutationRate);
             while (indexSet.size() < noOfMutation) {
-                indexSet.add(RandomNumberGenerator.getRandomGenerator().nextInt(length));
+                indexSet.add(randomProvider.nextInt(length));
             }
-        } else if (RandomNumberGenerator.getRandomGenerator().nextDouble() < chromosomeMutationRate) {
-            indexSet.add(RandomNumberGenerator.getRandomGenerator().nextInt(length));
+        } else if (randomProvider.nextDouble() < chromosomeMutationRate) {
+            indexSet.add(randomProvider.nextInt(length));
         }
 
         return indexSet;

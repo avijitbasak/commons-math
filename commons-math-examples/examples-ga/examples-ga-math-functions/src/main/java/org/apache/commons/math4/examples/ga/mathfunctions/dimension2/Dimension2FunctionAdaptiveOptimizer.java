@@ -23,7 +23,7 @@ import org.apache.commons.math4.ga.chromosome.BinaryChromosome;
 import org.apache.commons.math4.ga.chromosome.Chromosome;
 import org.apache.commons.math4.ga.convergence.StoppingCondition;
 import org.apache.commons.math4.ga.convergence.UnchangedBestFitness;
-import org.apache.commons.math4.ga.crossover.OnePointCrossover;
+import org.apache.commons.math4.ga.crossover.OnePointBinaryCrossover;
 import org.apache.commons.math4.ga.crossover.rategenerator.ConstantCrossoverRateGenerator;
 import org.apache.commons.math4.ga.listener.ConvergenceListenerRegistry;
 import org.apache.commons.math4.ga.listener.PopulationStatisticsLogger;
@@ -72,7 +72,7 @@ public class Dimension2FunctionAdaptiveOptimizer {
 
         // initialize a new genetic algorithm
         final AdaptiveGeneticAlgorithm<Dimension2Coordinate> ga = new AdaptiveGeneticAlgorithm<>(
-                new OnePointCrossover<Integer, Dimension2Coordinate>(), new ConstantCrossoverRateGenerator<>(1),
+                new OnePointBinaryCrossover<Dimension2Coordinate>(), new ConstantCrossoverRateGenerator<>(1),
                 new BinaryMutation<Dimension2Coordinate>(),
                 new AdaptiveLinearMutationRateGenerator<>(Constants.AVERAGE_MUTATION_RATE / 2,
                         Constants.AVERAGE_MUTATION_RATE * 2),
