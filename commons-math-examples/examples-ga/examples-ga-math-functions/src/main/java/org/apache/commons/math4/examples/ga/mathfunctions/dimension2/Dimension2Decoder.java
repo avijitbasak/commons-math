@@ -33,14 +33,15 @@ public class Dimension2Decoder implements Decoder<Dimension2Coordinate> {
      */
     @Override
     public Dimension2Coordinate decode(Chromosome<Dimension2Coordinate> chromosome) {
-        final BinaryChromosome<Dimension2Coordinate> binaryChromosome = (BinaryChromosome<Dimension2Coordinate>) chromosome;
+        final BinaryChromosome<Dimension2Coordinate> binaryChromosome =
+                (BinaryChromosome<Dimension2Coordinate>) chromosome;
         final long alleles = binaryChromosome.getRepresentation()[0];
 
         long mask1 = ~(Long.MAX_VALUE << 12);
         long mask2 = ~(Long.MAX_VALUE << 24) ^ mask1;
 
-        double x = (alleles & mask1) / 100d;
-        double y = ((alleles & mask2) >> 12) / 100d;
+        final double x = (alleles & mask1) / 100d;
+        final double y = ((alleles & mask2) >> 12) / 100d;
 
         return new Dimension2Coordinate(x, y);
     }
