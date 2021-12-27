@@ -120,5 +120,10 @@ public class AbstractIntegerDistributionTest {
         public int getSupportUpperBound() {
             return 6;
         }
+
+        @Override
+        public final boolean isSupportConnected() {
+            return true;
+        }
     }
 }
