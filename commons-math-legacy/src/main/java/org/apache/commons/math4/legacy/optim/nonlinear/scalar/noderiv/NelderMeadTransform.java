@@ -22,14 +22,12 @@ import java.util.function.DoublePredicate;
 
 import org.apache.commons.math4.legacy.analysis.MultivariateFunction;
 import org.apache.commons.math4.legacy.optim.PointValuePair;
-import org.apache.commons.math4.legacy.optim.OptimizationData;
 
 /**
  * <a href="https://en.wikipedia.org/wiki/Nelder%E2%80%93Mead_method">Nelder-Mead method</a>.
  */
 public class NelderMeadTransform
-    implements Simplex.TransformFactory,
-               OptimizationData {
+    implements Simplex.TransformFactory {
     /** Default value for {@link #alpha}: {@value}. */
     private static final double DEFAULT_ALPHA = 1;
     /** Default value for {@link #gamma}: {@value}. */
@@ -77,21 +75,19 @@ public class NelderMeadTransform
     @Override
     public UnaryOperator<Simplex> create(final MultivariateFunction evaluationFunction,
                                          final Comparator<PointValuePair> comparator,
-                                         final DoublePredicate unused) {
+                                         final DoublePredicate sa) {
         return original -> {
-            Simplex newSimplex = original;
-
             // The simplex has n + 1 points if dimension is n.
-            final int n = newSimplex.getDimension();
+            final int n = original.getDimension();
 
             // Interesting values.
-            final PointValuePair best = newSimplex.get(0);
-            final PointValuePair secondWorst = newSimplex.get(n - 1);
-            final PointValuePair worst = newSimplex.get(n);
+            final PointValuePair best = original.get(0);
+            final PointValuePair secondWorst = original.get(n - 1);
+            final PointValuePair worst = original.get(n);
             final double[] xWorst = worst.getPoint();
 
             // Centroid of the best vertices, dismissing the worst point (at index n).
-            final double[] centroid = Simplex.centroid(newSimplex.asList().subList(0, n));
+            final double[] centroid = Simplex.centroid(original.asList().subList(0, n));
 
             // Reflection.
             final PointValuePair reflected = Simplex.newPoint(centroid,
@@ -100,7 +96,7 @@ public class NelderMeadTransform
                                                               evaluationFunction);
             if (comparator.compare(reflected, secondWorst) < 0 &&
                 comparator.compare(best, reflected) <= 0) {
-                return newSimplex.replaceLast(reflected);
+                return original.replaceLast(reflected);
             }
 
             if (comparator.compare(reflected, best) < 0) {
@@ -109,10 +105,12 @@ public class NelderMeadTransform
                                                                  -gamma,
                                                                  xWorst,
                                                                  evaluationFunction);
-                if (comparator.compare(expanded, reflected) < 0) {
-                    return newSimplex.replaceLast(expanded);
+                if (comparator.compare(expanded, reflected) < 0 ||
+                    (sa != null &&
+                     sa.test(expanded.getValue() - reflected.getValue()))) {
+                    return original.replaceLast(expanded);
                 } else {
-                    return newSimplex.replaceLast(reflected);
+                    return original.replaceLast(reflected);
                 }
             }
 
@@ -123,7 +121,7 @@ public class NelderMeadTransform
                                                                    reflected.getPoint(),
                                                                    evaluationFunction);
                 if (comparator.compare(contracted, reflected) < 0) {
-                    return newSimplex.replaceLast(contracted); // Accept contracted point.
+                    return original.replaceLast(contracted); // Accept contracted point.
                 }
             } else {
                 // Inside contraction.
@@ -132,12 +130,21 @@ public class NelderMeadTransform
                                                                    xWorst,
                                                                    evaluationFunction);
                 if (comparator.compare(contracted, worst) < 0) {
-                    return newSimplex.replaceLast(contracted); // Accept contracted point.
+                    return original.replaceLast(contracted); // Accept contracted point.
                 }
             }
 
             // Shrink.
-            return newSimplex.shrink(sigma, evaluationFunction);
+            return original.shrink(sigma, evaluationFunction);
         };
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public String toString() {
+        return "Nelder-Mead [a=" + alpha +
+            " g=" + gamma +
+            " r=" + rho +
+            " s=" + sigma + "]";
     }
 }

@@ -22,7 +22,7 @@ import org.apache.commons.math4.legacy.exception.MathIllegalArgumentException;
 import org.apache.commons.math4.legacy.exception.OutOfRangeException;
 import org.apache.commons.rng.UniformRandomProvider;
 import org.apache.commons.rng.simple.RandomSource;
-import org.apache.commons.math4.legacy.core.jdkmath.AccurateMath;
+import org.apache.commons.math4.core.jdkmath.JdkMath;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -163,46 +163,46 @@ public final class SimpleRegressionTest {
         if (model1.getN() != model2.getN()) {
             return false;
         }
-        if (AccurateMath.abs(model1.getIntercept() - model2.getIntercept()) > tol) {
+        if (JdkMath.abs(model1.getIntercept() - model2.getIntercept()) > tol) {
             return false;
         }
-        if (AccurateMath.abs(model1.getInterceptStdErr() - model2.getInterceptStdErr()) > tol) {
+        if (JdkMath.abs(model1.getInterceptStdErr() - model2.getInterceptStdErr()) > tol) {
             return false;
         }
-        if (AccurateMath.abs(model1.getMeanSquareError() - model2.getMeanSquareError()) > tol) {
+        if (JdkMath.abs(model1.getMeanSquareError() - model2.getMeanSquareError()) > tol) {
             return false;
         }
-        if (AccurateMath.abs(model1.getR() - model2.getR()) > tol) {
+        if (JdkMath.abs(model1.getR() - model2.getR()) > tol) {
             return false;
         }
-        if (AccurateMath.abs(model1.getRegressionSumSquares() - model2.getRegressionSumSquares()) > tol) {
+        if (JdkMath.abs(model1.getRegressionSumSquares() - model2.getRegressionSumSquares()) > tol) {
             return false;
         }
-        if (AccurateMath.abs(model1.getRSquare() - model2.getRSquare()) > tol) {
+        if (JdkMath.abs(model1.getRSquare() - model2.getRSquare()) > tol) {
             return false;
         }
-        if (AccurateMath.abs(model1.getSignificance() - model2.getSignificance()) > tol) {
+        if (JdkMath.abs(model1.getSignificance() - model2.getSignificance()) > tol) {
             return false;
         }
-        if (AccurateMath.abs(model1.getSlope() - model2.getSlope()) > tol) {
+        if (JdkMath.abs(model1.getSlope() - model2.getSlope()) > tol) {
             return false;
         }
-        if (AccurateMath.abs(model1.getSlopeConfidenceInterval() - model2.getSlopeConfidenceInterval()) > tol) {
+        if (JdkMath.abs(model1.getSlopeConfidenceInterval() - model2.getSlopeConfidenceInterval()) > tol) {
             return false;
         }
-        if (AccurateMath.abs(model1.getSlopeStdErr() - model2.getSlopeStdErr()) > tol) {
+        if (JdkMath.abs(model1.getSlopeStdErr() - model2.getSlopeStdErr()) > tol) {
             return false;
         }
-        if (AccurateMath.abs(model1.getSumOfCrossProducts() - model2.getSumOfCrossProducts()) > tol) {
+        if (JdkMath.abs(model1.getSumOfCrossProducts() - model2.getSumOfCrossProducts()) > tol) {
             return false;
         }
-        if (AccurateMath.abs(model1.getSumSquaredErrors() - model2.getSumSquaredErrors()) > tol) {
+        if (JdkMath.abs(model1.getSumSquaredErrors() - model2.getSumSquaredErrors()) > tol) {
             return false;
         }
-        if (AccurateMath.abs(model1.getTotalSumSquares() - model2.getTotalSumSquares()) > tol) {
+        if (JdkMath.abs(model1.getTotalSumSquares() - model2.getTotalSumSquares()) > tol) {
             return false;
         }
-        if (AccurateMath.abs(model1.getXSumSquares() - model2.getXSumSquares()) > tol) {
+        if (JdkMath.abs(model1.getXSumSquares() - model2.getXSumSquares()) > tol) {
             return false;
         }
         return true;
@@ -456,7 +456,7 @@ public final class SimpleRegressionTest {
         Assert.assertTrue("predict not NaN", Double.isNaN(regression.predict(0)));
 
         // but SSTO should be OK
-        Assert.assertTrue("SSTO NaN", !Double.isNaN(regression.getTotalSumSquares()));
+        Assert.assertFalse("SSTO NaN", Double.isNaN(regression.getTotalSumSquares()));
 
         regression = new SimpleRegression();
 
@@ -464,24 +464,24 @@ public final class SimpleRegressionTest {
         regression.addData(3, 3);
 
         // All should be OK except MSE, s(b0), s(b1) which need one more df
-        Assert.assertTrue("interceptNaN", !Double.isNaN(regression.getIntercept()));
-        Assert.assertTrue("slope NaN", !Double.isNaN(regression.getSlope()));
+        Assert.assertFalse("interceptNaN", Double.isNaN(regression.getIntercept()));
+        Assert.assertFalse("slope NaN", Double.isNaN(regression.getSlope()));
         Assert.assertTrue("slope std err not NaN", Double.isNaN(regression.getSlopeStdErr()));
         Assert.assertTrue("intercept std err not NaN", Double.isNaN(regression.getInterceptStdErr()));
         Assert.assertTrue("MSE not NaN", Double.isNaN(regression.getMeanSquareError()));
-        Assert.assertTrue("r NaN", !Double.isNaN(regression.getR()));
-        Assert.assertTrue("r-square NaN", !Double.isNaN(regression.getRSquare()));
-        Assert.assertTrue("RSS NaN", !Double.isNaN(regression.getRegressionSumSquares()));
-        Assert.assertTrue("SSE NaN", !Double.isNaN(regression.getSumSquaredErrors()));
-        Assert.assertTrue("SSTO NaN", !Double.isNaN(regression.getTotalSumSquares()));
-        Assert.assertTrue("predict NaN", !Double.isNaN(regression.predict(0)));
+        Assert.assertFalse("r NaN", Double.isNaN(regression.getR()));
+        Assert.assertFalse("r-square NaN", Double.isNaN(regression.getRSquare()));
+        Assert.assertFalse("RSS NaN", Double.isNaN(regression.getRegressionSumSquares()));
+        Assert.assertFalse("SSE NaN", Double.isNaN(regression.getSumSquaredErrors()));
+        Assert.assertFalse("SSTO NaN", Double.isNaN(regression.getTotalSumSquares()));
+        Assert.assertFalse("predict NaN", Double.isNaN(regression.predict(0)));
 
         regression.addData(1, 4);
 
         // MSE, MSE, s(b0), s(b1) should all be OK now
-        Assert.assertTrue("MSE NaN", !Double.isNaN(regression.getMeanSquareError()));
-        Assert.assertTrue("slope std err NaN", !Double.isNaN(regression.getSlopeStdErr()));
-        Assert.assertTrue("intercept std err NaN", !Double.isNaN(regression.getInterceptStdErr()));
+        Assert.assertFalse("MSE NaN", Double.isNaN(regression.getMeanSquareError()));
+        Assert.assertFalse("slope std err NaN", Double.isNaN(regression.getSlopeStdErr()));
+        Assert.assertFalse("intercept std err NaN", Double.isNaN(regression.getInterceptStdErr()));
     }
 
     @Test

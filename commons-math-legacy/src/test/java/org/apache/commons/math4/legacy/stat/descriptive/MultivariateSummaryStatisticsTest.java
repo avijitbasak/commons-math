@@ -23,7 +23,7 @@ import org.apache.commons.math4.legacy.TestUtils;
 import org.apache.commons.math4.legacy.exception.DimensionMismatchException;
 import org.apache.commons.math4.legacy.exception.MathIllegalStateException;
 import org.apache.commons.math4.legacy.stat.descriptive.moment.Mean;
-import org.apache.commons.math4.legacy.core.jdkmath.AccurateMath;
+import org.apache.commons.math4.core.jdkmath.JdkMath;
 import org.junit.Test;
 import org.junit.Assert;
 
@@ -211,8 +211,8 @@ public class MultivariateSummaryStatisticsTest {
         Assert.assertEquals( 2.9129506302439405217, u.getGeometricMean()[1], 1.0e-10);
         Assert.assertEquals( 2, u.getMean()[0], 1.0e-10);
         Assert.assertEquals( 3, u.getMean()[1], 1.0e-10);
-        Assert.assertEquals(AccurateMath.sqrt(2.0 / 3.0), u.getStandardDeviation()[0], 1.0e-10);
-        Assert.assertEquals(AccurateMath.sqrt(2.0 / 3.0), u.getStandardDeviation()[1], 1.0e-10);
+        Assert.assertEquals(JdkMath.sqrt(2.0 / 3.0), u.getStandardDeviation()[0], 1.0e-10);
+        Assert.assertEquals(JdkMath.sqrt(2.0 / 3.0), u.getStandardDeviation()[1], 1.0e-10);
         Assert.assertEquals(2.0 / 3.0, u.getCovariance().getEntry(0, 0), 1.0e-10);
         Assert.assertEquals(2.0 / 3.0, u.getCovariance().getEntry(0, 1), 1.0e-10);
         Assert.assertEquals(2.0 / 3.0, u.getCovariance().getEntry(1, 0), 1.0e-10);
@@ -282,12 +282,12 @@ public class MultivariateSummaryStatisticsTest {
         MultivariateSummaryStatistics u = createMultivariateSummaryStatistics(2, true);
         MultivariateSummaryStatistics t = null;
         int emptyHash = u.hashCode();
-        Assert.assertTrue(u.equals(u));
-        Assert.assertFalse(u.equals(t));
+        Assert.assertEquals(u, u);
+        Assert.assertNotEquals(u, t);
         Assert.assertFalse(u.equals(Double.valueOf(0)));
         t = createMultivariateSummaryStatistics(2, true);
-        Assert.assertTrue(t.equals(u));
-        Assert.assertTrue(u.equals(t));
+        Assert.assertEquals(t, u);
+        Assert.assertEquals(u, t);
         Assert.assertEquals(emptyHash, t.hashCode());
 
         // Add some data to u

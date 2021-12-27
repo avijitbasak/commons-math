@@ -324,7 +324,7 @@ public class ResizableDoubleArrayTest extends DoubleArrayAbstractTest {
         Assert.assertEquals("Initial number of elements should be 0", 0, eDA2.getNumElements());
 
         final DiscreteDistribution.Sampler randomData =
-            new UniformDiscreteDistribution(100, 1000).createSampler(RandomSource.WELL_19937_C.create());
+            UniformDiscreteDistribution.of(100, 1000).createSampler(RandomSource.WELL_19937_C.create());
         final int iterations = randomData.sample();
 
         for( int i = 0; i < iterations; i++) {
@@ -346,7 +346,7 @@ public class ResizableDoubleArrayTest extends DoubleArrayAbstractTest {
         Assert.assertEquals("Initial number of elements should be 0", 0, eDA3.getNumElements() );
 
         final DiscreteDistribution.Sampler randomData =
-            new UniformDiscreteDistribution(100, 3000).createSampler(RandomSource.WELL_19937_C.create());
+            UniformDiscreteDistribution.of(100, 3000).createSampler(RandomSource.WELL_19937_C.create());
 
         final int iterations = randomData.sample();
 
@@ -462,7 +462,7 @@ public class ResizableDoubleArrayTest extends DoubleArrayAbstractTest {
         Assert.assertFalse(first.equals(other));
 
         // Reflexive
-        Assert.assertTrue(first.equals(first));
+        Assert.assertEquals(first, first);
 
         // Non-argument constructor
         ResizableDoubleArray second = new ResizableDoubleArray();
@@ -568,15 +568,15 @@ public class ResizableDoubleArrayTest extends DoubleArrayAbstractTest {
     }
 
     private void verifyEquality(ResizableDoubleArray a, ResizableDoubleArray b) {
-        Assert.assertTrue(b.equals(a));
-        Assert.assertTrue(a.equals(b));
+        Assert.assertEquals(b, a);
+        Assert.assertEquals(a, b);
         Assert.assertEquals(a.hashCode(), b.hashCode());
     }
 
     private void verifyInequality(ResizableDoubleArray a, ResizableDoubleArray b) {
-        Assert.assertFalse(b.equals(a));
-        Assert.assertFalse(a.equals(b));
-        Assert.assertFalse(a.hashCode() == b.hashCode());
+        Assert.assertNotEquals(b, a);
+        Assert.assertNotEquals(a, b);
+        Assert.assertNotEquals(a.hashCode(), b.hashCode());
     }
 
 }

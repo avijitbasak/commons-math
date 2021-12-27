@@ -34,7 +34,7 @@ import org.apache.commons.math4.legacy.analysis.integration.BaseAbstractUnivaria
 import org.apache.commons.math4.legacy.analysis.integration.IterativeLegendreGaussIntegrator;
 import org.apache.commons.math4.legacy.exception.NotStrictlyPositiveException;
 import org.apache.commons.math4.legacy.stat.descriptive.SummaryStatistics;
-import org.apache.commons.math4.legacy.core.jdkmath.AccurateMath;
+import org.apache.commons.math4.core.jdkmath.JdkMath;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -366,10 +366,10 @@ public final class EmpiricalDistributionTest extends RealDistributionAbstractTes
      */
     private int findBin(double x) {
         // Number of bins below x should be trunc(x/10)
-        final double nMinus = AccurateMath.floor(x / 10);
-        final int bin =  (int) AccurateMath.round(nMinus);
+        final double nMinus = JdkMath.floor(x / 10);
+        final int bin =  (int) JdkMath.round(nMinus);
         // If x falls on a bin boundary, it is in the lower bin
-        return AccurateMath.floor(x / 10) == x / 10 ? bin - 1 : bin;
+        return JdkMath.floor(x / 10) == x / 10 ? bin - 1 : bin;
     }
 
     /**
@@ -381,9 +381,9 @@ public final class EmpiricalDistributionTest extends RealDistributionAbstractTes
      */
     private ContinuousDistribution findKernel(double lower, double upper) {
         if (lower < 1) {
-            return new NormalDistribution(5d, 3.3166247903554);
+            return NormalDistribution.of(5d, 3.3166247903554);
         } else {
-            return new NormalDistribution((upper + lower + 1) / 2d, 3.0276503540974917);
+            return NormalDistribution.of((upper + lower + 1) / 2d, 3.0276503540974917);
         }
     }
 
@@ -392,7 +392,7 @@ public final class EmpiricalDistributionTest extends RealDistributionAbstractTes
         final double[] data = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
         final EmpiricalDistribution dist =
             EmpiricalDistribution.from(5, data,
-                                       s -> new UniformContinuousDistribution(s.getMin(), s.getMax()));
+                                       s -> UniformContinuousDistribution.of(s.getMin(), s.getMax()));
         final ContinuousDistribution.Sampler sampler
             = dist.createSampler(RandomSource.WELL_19937_C.create(1000));
         // Kernels are uniform distributions on [1,3], [4,6], [7,9], [10,12], [13,15]
@@ -424,7 +424,7 @@ public final class EmpiricalDistributionTest extends RealDistributionAbstractTes
     public void testMath1431() {
         final UniformRandomProvider rng = RandomSource.WELL_19937_C.create(1000);
         final ContinuousDistribution.Sampler exponentialDistributionSampler
-            = new ExponentialDistribution(0.05).createSampler(rng);
+            = ExponentialDistribution.of(0.05).createSampler(rng);
         final double[] empiricalDataPoints = new double[3000];
         for (int i = 0; i < empiricalDataPoints.length; i++) {
             empiricalDataPoints[i] = exponentialDistributionSampler.sample();
@@ -473,5 +473,28 @@ public final class EmpiricalDistributionTest extends RealDistributionAbstractTes
         p = 0.51111;
         v = ed.inverseCumulativeProbability(p);
         Assert.assertTrue("p=" + p + " => v=" + v, v < 6350);
+    }
+
+    @Test
+    public void testMath1462InfiniteQuantile() {
+        final double[] data = {
+            18054, 17548, 17350, 17860, 17827, 17653, 18113, 18405, 17746,
+            17647, 18160, 17955, 17705, 17890, 17974, 17857, 13287, 18645,
+            17775, 17730, 17996, 18263, 17861, 17161, 17717, 18134, 18669,
+            18340, 17221, 18292, 18146, 17520, 18207, 17829, 18206, 13301,
+            18257, 17626, 18358, 18340, 18320, 17852, 17804, 17577, 17718,
+            18099, 13395, 17763, 17911, 17978, 12935, 17519, 17550, 18728,
+            18518, 17698, 18739, 18553, 17982, 18113, 17974, 17961, 17645,
+            17867, 17890, 17498, 18718, 18191, 18177, 17923, 18164, 18155,
+            6212, 5961, 711
+        };
+
+        final double p = 0.32;
+        for (int i = 745; i <= 1100; i++) {
+            final EmpiricalDistribution ed = EmpiricalDistribution.from(i, data);
+            final double v = ed.inverseCumulativeProbability(p);
+
+            Assert.assertTrue("p=" + p + " => v=" + v, Double.isFinite(v));
+        }
     }
 }

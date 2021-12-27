@@ -111,7 +111,7 @@ public class HessenbergTransformerTest {
         for (int run = 0; run < 100; run++) {
             Random r = new Random(System.currentTimeMillis());
             ContinuousDistribution.Sampler dist
-                = new NormalDistribution(0.0, r.nextDouble() * 5).createSampler(RandomSource.WELL_512_A.create(64925784252L));
+                = NormalDistribution.of(0.0, r.nextDouble() * 5).createSampler(RandomSource.WELL_512_A.create(64925784252L));
 
             // matrix size
             int size = r.nextInt(20) + 4;
@@ -218,7 +218,7 @@ public class HessenbergTransformerTest {
         Assert.assertEquals(0, h.subtract(MatrixUtils.createRealMatrix(hRef)).getNorm(), 1.0e-14);
 
         // check the same cached instance is returned the second time
-        Assert.assertTrue(p == transformer.getP());
-        Assert.assertTrue(h == transformer.getH());
+        Assert.assertSame(p, transformer.getP());
+        Assert.assertSame(h, transformer.getH());
     }
 }

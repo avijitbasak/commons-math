@@ -17,13 +17,20 @@
 package org.apache.commons.math4.legacy.optim.nonlinear.scalar;
 
 import java.util.function.Function;
+import java.util.function.DoubleUnaryOperator;
 import org.apache.commons.math4.legacy.analysis.MultivariateFunction;
-import org.apache.commons.math4.legacy.core.jdkmath.AccurateMath;
 
 /**
- * Multivariate scalar functions for testing an optimizer.
+ * Generators of {@link MultivariateFunction multivariate scalar functions}.
+ * The functions are intended for testing optimizer implementations.
+ * <p>
+ * Note: The {@link #withDimension(int) function generators} take the space
+ * dimension (i.e. the length of the array argument passed to the generated
+ * function) as argument; it is thus assumed that the test functions can be
+ * generalized to any dimension.
  */
 public enum TestFunction {
+    // https://www.sfu.ca/~ssurjano/spheref.html
     SPHERE(dim -> {
             return x -> {
                 double f = 0;
@@ -63,20 +70,26 @@ public enum TestFunction {
             };
         }),
     TWO_AXES(dim -> {
+            final int halfDim = dim / 2;
             return x -> {
                 double f = 0;
-                for (int i = 0; i < dim; i++) {
-                    f += (i < dim / 2 ? 1e6 : 1) * x[i] * x[i];
+                for (int i = 0; i < halfDim; i++) {
+                    f += 1e6 * x[i] * x[i];
+                }
+                for (int i = halfDim; i < dim; i++) {
+                    f += x[i] * x[i];
                 }
                 return f;
             };
         }),
     ELLI(dim -> {
-            final double last = dim - 1;
+            final double M = Math.pow(1e3, 1d / (dim - 1));
             return x -> {
+                double factor = 1;
                 double f = 0;
                 for (int i = 0; i < dim; i++) {
-                    f += Math.pow(1e3, i / last) * x[i] * x[i];
+                    f += factor * x[i] * x[i];
+                    factor *= M;
                 }
                 return f;
             };
@@ -87,36 +100,17 @@ public enum TestFunction {
                 return 1 - elli.value(x);
             };
         }),
-    DIFF_POW(dim -> {
-            final double A = 10d / (dim - 1);
+    // https://www.sfu.ca/~ssurjano/sumpow.html
+    SUM_POW(dim -> {
             return x -> {
                 double f = 0;
                 for (int i = 0; i < dim; i++) {
-                    f += AccurateMath.pow(Math.abs(x[i]), A * i + 2);
+                    f += Math.pow(Math.abs(x[i]), i + 2);
                 }
                 return f;
             };
         }),
-    SS_DIFF_POW(dim -> {
-            final MultivariateFunction diffPow = DIFF_POW.withDimension(dim);
-            return x -> {
-                double f = Math.pow(diffPow.value(x), 0.25);
-                return f;
-            };
-        }),
-    ROSEN(dim -> {
-            final int last = dim - 1;
-            return x -> {
-                double f = 0;
-                for (int i = 0; i < last; i++) {
-                    final double xi = x[i];
-                    final double a = xi * xi - x[i + 1];
-                    final double b = xi - 1;
-                    f += 1e2 * a * a + b * b;
-                }
-                return f;
-            };
-        }),
+    // https://www.sfu.ca/~ssurjano/ackley.html
     ACKLEY(dim -> {
             final double A = 20;
             final double B = 0.2;
@@ -138,47 +132,61 @@ public enum TestFunction {
     // https://www.sfu.ca/~ssurjano/rastr.html
     RASTRIGIN(dim -> {
             final double A = 10;
+            final double twopi = 2 * Math.PI;
             return x -> {
                 double sum = 0;
                 for (int i = 0; i < dim; i++) {
                     final double xi = x[i];
-                    sum += xi * xi - A * Math.cos(2 * Math.PI * xi);
+                    sum += xi * xi - A * Math.cos(twopi * xi);
                 }
                 return A * dim + sum;
             };
         }),
-    // https://www.sfu.ca/~ssurjano/powell.html
-    POWELL(dim -> {
-            final int last = dim / 4;
+    // http://benchmarkfcns.xyz/benchmarkfcns/salomonfcn.html
+    SALOMON(dim -> {
+            return x -> {
+                double sum = 0;
+                for (int i = 0; i < dim; i++) {
+                    final double xi = x[i];
+                    sum += xi * xi;
+                }
+                final double sqrtSum = Math.sqrt(sum);
+                return 1 - Math.cos(2 * Math.PI * sqrtSum) + 0.1 * sqrtSum;
+            };
+        }),
+    // https://scholarship.rice.edu/handle/1911/16304
+    ROSENBROCK(dim -> {
+            if (dim % 2 != 0) {
+                throw new IllegalArgumentException("Must be a multiple of 2 (was: " + dim + ")");
+            }
+            final int last = dim / 2;
             return x -> {
                 double f = 0;
-                for (int i = 0; i < last; i++) {
-                    final int fourI = 4 * i;
-                    final double x4i = x[fourI];
-                    final double x4iP1 = x[fourI + 1];
-                    final double x4iP2 = x[fourI + 2];
-                    final double x4iP3 = x[fourI + 3];
-                    final double a = x4i + 10 * x4iP1;
-                    final double b = x4iP2 - x4iP3;
-                    final double c = x4iP1 - 2 * x4iP2;
-                    final double d = x4i - x4iP3;
-                    f += a * a + 5 * b * b + c * c * c * c + 10 * d * d * d * d;
+                for (int i = 1; i <= last; i++) {
+                    final int twoI = 2 * i;
+                    final int i0 = twoI - 1;
+                    final int i1 = twoI;
+                    final double x2iM1 = x[i0 - 1];
+                    final double x2i = x[i1 - 1];
+                    final double t2iM1 = x2i - x2iM1 * x2iM1;
+                    final double t2i = 1 - x2iM1;
+                    f += 100 * t2iM1 * t2iM1 + t2i * t2i;
                 }
                 return f;
             };
         }),
-    ROSENBROCK(dim -> {
-            final int last = dim - 1;
+    // http://benchmarkfcns.xyz/benchmarkfcns/happycatfcn.html
+    HAPPY_CAT(dim -> {
+            final double alpha = 0.125;
             return x -> {
-                double f = 0;
-                for (int i = 0; i < last; i++) {
+                double sum = 0;
+                double sumSq = 0;
+                for (int i = 0; i < dim; i++) {
                     final double xi = x[i];
-                    final double xiP1 = x[i + 1];
-                    final double a = xiP1 - xi * xi;
-                    final double b = xi - 1;
-                    f += 100 * a * a + b * b;
+                    sum += xi;
+                    sumSq += xi * xi;
                 }
-                return f;
+                return Math.pow(sumSq - dim, 2 * alpha) + (0.5 * sumSq + sum) / dim + 0.5;
             };
         }),
     PARABOLA(dim -> {
@@ -189,6 +197,130 @@ public enum TestFunction {
                     f += xi * xi;
                 }
                 return f;
+            };
+        }),
+    // https://www.sfu.ca/~ssurjano/griewank.html
+    GRIEWANK(dim -> {
+            final double A = 4000;
+            return x -> {
+                double sum = 0;
+                double prod = 1;
+                for (int i = 0; i < dim; i++) {
+                    final double xi = x[i];
+                    sum += xi * xi;
+                    prod *= Math.cos(xi / Math.sqrt(i + 1));
+                }
+                return sum / A - prod + 1;
+            };
+        }),
+    // https://www.sfu.ca/~ssurjano/levy.html
+    LEVY(dim -> {
+            final int last = dim - 1;
+            final DoubleUnaryOperator w = x -> 1 + 0.25 * (x - 1);
+            return x -> {
+                final double a0 = Math.sin(Math.PI * w.applyAsDouble(x[0]));
+                double sum = a0 * a0;
+                for (int i = 0; i < last; i++) {
+                    final double wi = w.applyAsDouble(x[i]);
+                    final double wiM1 = wi - 1;
+                    final double ai = Math.sin(Math.PI * wi + 1);
+                    sum += wiM1 * wiM1 * (1 + 10 * ai * ai);
+                }
+                final double wl = w.applyAsDouble(x[last]);
+                final double wlM1 = wl - 1;
+                final double al = Math.sin(2 * Math.PI * wl);
+                return sum + wlM1 * wlM1 * (1 + al * al);
+            };
+        }),
+    // https://www.sfu.ca/~ssurjano/schwef.html
+    SCHWEFEL(dim -> {
+            final double A = 418.9829;
+            return x -> {
+                double sum = 0;
+                for (int i = 0; i < dim; i++) {
+                    final double xi = x[i];
+                    sum += xi * Math.sin(Math.sqrt(Math.abs(xi)));
+                }
+                return A * dim - sum;
+            };
+        }),
+    // https://www.sfu.ca/~ssurjano/zakharov.html
+    ZAKHAROV(dim -> {
+            final double A = 0.5;
+            return x -> {
+                double sum1 = 0;
+                double sum2 = 0;
+                for (int i = 0; i < dim; i++) {
+                    final double xi = x[i];
+                    sum1 += xi * xi;
+                    sum2 += A * (i + 1) * xi;
+                }
+                final double sum22 = sum2 * sum2;
+                return sum1 + sum22 + sum22 * sum22;
+            };
+        }),
+    // https://www.sfu.ca/~ssurjano/permdb.html
+    PERM(dim -> {
+            final double BETA = 10;
+            return x -> {
+                double sum1 = 0;
+                for (int i = 0; i < dim; i++) {
+                    final double iP1 = i + 1;
+                    double sum2 = 0;
+                    for (int j = 0; j < dim; j++) {
+                        final double jP1 = j + 1;
+                        final double a = Math.pow(jP1, iP1) + BETA;
+                        final double b = Math.pow(x[j] / jP1, iP1) - 1;
+                        sum2 += a * b;
+                    }
+                    sum1 += sum2 * sum2;
+                }
+                return sum1;
+            };
+        }),
+    // https://www.sfu.ca/~ssurjano/stybtang.html
+    STYBLINSKI_TANG(dim -> {
+            final double A = 0.5;
+            final double B = 16;
+            final double C = 5;
+            return x -> {
+                double sum = 0;
+                for (int i = 0; i < dim; i++) {
+                    final double xi = x[i];
+                    final double xi2 = xi * xi;
+                    final double xi4 = xi2 * xi2;
+                    sum += xi4 - B * xi2 + C * xi;
+                }
+                return A * sum;
+            };
+        }),
+    // https://scholarship.rice.edu/handle/1911/16304
+    POWELL(dim -> {
+            if (dim % 4 != 0) {
+                throw new IllegalArgumentException("Must be a multiple of 4 (was: " + dim + ")");
+            }
+            final int last = dim / 4;
+            return x -> {
+                double sum = 0;
+                for (int i = 1; i <= last; i++) {
+                    final int fourI = 4 * i;
+                    final int i0 = fourI - 3;
+                    final int i1 = fourI - 2;
+                    final int i2 = fourI - 1;
+                    final int i3 = fourI;
+                    final double x4iM3 = x[i0 - 1];
+                    final double x4iM2 = x[i1 - 1];
+                    final double x4iM1 = x[i2 - 1];
+                    final double x4i = x[i3 - 1];
+                    final double t4iM3 = x4iM3 + 10 * x4iM2;
+                    final double t4iM2 = x4iM1 - x4i;
+                    final double t4iM1 = x4iM2 - 2 * x4iM1;
+                    final double sqT4iM1 = t4iM1 * t4iM1;
+                    final double t4i = x4iM3 - x4i;
+                    final double sqT4i = t4i * t4i;
+                    sum += t4iM3 * t4iM3 + 5 * t4iM2 * t4iM2 + sqT4iM1 * sqT4iM1 + 10 * sqT4i * sqT4i;
+                }
+                return sum;
             };
         });
 

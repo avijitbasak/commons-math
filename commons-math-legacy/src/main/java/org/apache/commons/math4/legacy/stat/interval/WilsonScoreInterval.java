@@ -17,7 +17,7 @@
 package org.apache.commons.math4.legacy.stat.interval;
 
 import org.apache.commons.statistics.distribution.NormalDistribution;
-import org.apache.commons.math4.legacy.core.jdkmath.AccurateMath;
+import org.apache.commons.math4.core.jdkmath.JdkMath;
 
 /**
  * Implements the <a href="http://en.wikipedia.org/wiki/Binomial_proportion_confidence_interval#Wilson_score_interval">
@@ -32,7 +32,7 @@ public class WilsonScoreInterval implements BinomialConfidenceInterval {
     public ConfidenceInterval createInterval(int numberOfTrials, int numberOfSuccesses, double confidenceLevel) {
         IntervalUtils.checkParameters(numberOfTrials, numberOfSuccesses, confidenceLevel);
         final double alpha = (1 - confidenceLevel) / 2;
-        final NormalDistribution normalDistribution = new NormalDistribution(0, 1);
+        final NormalDistribution normalDistribution = NormalDistribution.of(0, 1);
         final double z = normalDistribution.inverseCumulativeProbability(1 - alpha);
         final double zSquared = z * z;
         final double oneOverNumTrials = 1d / numberOfTrials;
@@ -41,7 +41,7 @@ public class WilsonScoreInterval implements BinomialConfidenceInterval {
 
         final double factor = 1 / (1 + zSquaredOverNumTrials);
         final double modifiedSuccessRatio = mean + zSquaredOverNumTrials / 2;
-        final double difference = z * AccurateMath.sqrt(oneOverNumTrials * mean * (1 - mean) +
+        final double difference = z * JdkMath.sqrt(oneOverNumTrials * mean * (1 - mean) +
                                                     (oneOverNumTrials * zSquaredOverNumTrials / 4));
 
         final double lowerBound = factor * (modifiedSuccessRatio - difference);

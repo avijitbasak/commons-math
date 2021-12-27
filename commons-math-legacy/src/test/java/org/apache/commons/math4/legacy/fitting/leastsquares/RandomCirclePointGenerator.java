@@ -22,7 +22,7 @@ import org.apache.commons.statistics.distribution.ContinuousDistribution;
 import org.apache.commons.statistics.distribution.UniformContinuousDistribution;
 import org.apache.commons.rng.UniformRandomProvider;
 import org.apache.commons.rng.simple.RandomSource;
-import org.apache.commons.math4.legacy.core.jdkmath.AccurateMath;
+import org.apache.commons.math4.core.jdkmath.JdkMath;
 
 /**
  * Factory for generating a cloud of points that approximate a circle.
@@ -51,9 +51,9 @@ public class RandomCirclePointGenerator {
                                       double ySigma) {
         final UniformRandomProvider rng = RandomSource.WELL_44497_B.create();
         this.radius = radius;
-        cX = new NormalDistribution(x, xSigma).createSampler(rng);
-        cY = new NormalDistribution(y, ySigma).createSampler(rng);
-        tP = new UniformContinuousDistribution(0, 2 * Math.PI).createSampler(rng);
+        cX = NormalDistribution.of(x, xSigma).createSampler(rng);
+        cY = NormalDistribution.of(y, ySigma).createSampler(rng);
+        tP = UniformContinuousDistribution.of(0, 2 * Math.PI).createSampler(rng);
     }
 
     /**
@@ -77,8 +77,8 @@ public class RandomCirclePointGenerator {
      */
     private Vector2D create() {
         final double t = tP.sample();
-        final double pX = cX.sample() + radius * AccurateMath.cos(t);
-        final double pY = cY.sample() + radius * AccurateMath.sin(t);
+        final double pX = cX.sample() + radius * JdkMath.cos(t);
+        final double pY = cY.sample() + radius * JdkMath.sin(t);
 
         return Vector2D.of(pX, pY);
     }

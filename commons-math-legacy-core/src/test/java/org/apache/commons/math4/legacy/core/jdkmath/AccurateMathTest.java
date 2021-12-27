@@ -20,30 +20,29 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
 
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
-
+import org.junit.jupiter.api.Assertions;
 import org.apache.commons.numbers.core.ArithmeticUtils;
 import org.apache.commons.numbers.core.Precision;
 import org.apache.commons.math4.legacy.core.dfp.Dfp;
 import org.apache.commons.math4.legacy.core.dfp.DfpField;
 import org.apache.commons.math4.legacy.core.dfp.DfpMath;
-import org.apache.commons.math4.legacy.exception.MathArithmeticException;
 import org.apache.commons.rng.UniformRandomProvider;
 import org.apache.commons.rng.simple.RandomSource;
 
+// Unit test should be moved to module "commons-math-core".
+// [Currently, it can't be because it depends on "legacy" classes.]
+import org.apache.commons.math4.core.jdkmath.AccurateMath;
+
 public class AccurateMathTest {
     // CHECKSTYLE: stop Regexp
-    // The above comment allowa System.out.print
+    // The above comment allows System.out.print
 
     private static final double MAX_ERROR_ULP = 0.51;
     private static final int NUMBER_OF_TRIALS = 1000;
@@ -622,32 +621,67 @@ public class AccurateMathTest {
 
         assertTrue("atan2(NaN, 0.0) should be NaN", Double.isNaN(AccurateMath.atan2(Double.NaN, 0.0)));
         assertTrue("atan2(0.0, NaN) should be NaN", Double.isNaN(AccurateMath.atan2(0.0, Double.NaN)));
-        assertEquals("atan2(0.0, 0.0) should be 0.0", 0.0, AccurateMath.atan2(0.0, 0.0), Precision.EPSILON);
-        assertEquals("atan2(0.0, 0.001) should be 0.0", 0.0, AccurateMath.atan2(0.0, 0.001), Precision.EPSILON);
-        assertEquals("atan2(0.1, +Inf) should be 0.0", 0.0, AccurateMath.atan2(0.1, Double.POSITIVE_INFINITY), Precision.EPSILON);
-        assertEquals("atan2(-0.0, 0.0) should be -0.0", -0.0, AccurateMath.atan2(-0.0, 0.0), Precision.EPSILON);
-        assertEquals("atan2(-0.0, 0.001) should be -0.0", -0.0, AccurateMath.atan2(-0.0, 0.001), Precision.EPSILON);
-        assertEquals("atan2(-0.0, +Inf) should be -0.0", -0.0, AccurateMath.atan2(-0.1, Double.POSITIVE_INFINITY), Precision.EPSILON);
-        assertEquals("atan2(0.0, -0.0) should be PI", AccurateMath.PI, AccurateMath.atan2(0.0, -0.0), Precision.EPSILON);
-        assertEquals("atan2(0.1, -Inf) should be PI", AccurateMath.PI, AccurateMath.atan2(0.1, Double.NEGATIVE_INFINITY), Precision.EPSILON);
-        assertEquals("atan2(-0.0, -0.0) should be -PI", -AccurateMath.PI, AccurateMath.atan2(-0.0, -0.0), Precision.EPSILON);
-        assertEquals("atan2(0.1, -Inf) should be -PI", -AccurateMath.PI, AccurateMath.atan2(-0.1, Double.NEGATIVE_INFINITY), Precision.EPSILON);
-        assertEquals("atan2(0.1, 0.0) should be PI/2", AccurateMath.PI / 2.0, AccurateMath.atan2(0.1, 0.0), Precision.EPSILON);
-        assertEquals("atan2(0.1, -0.0) should be PI/2", AccurateMath.PI / 2.0, AccurateMath.atan2(0.1, -0.0), Precision.EPSILON);
-        assertEquals("atan2(Inf, 0.1) should be PI/2", AccurateMath.PI / 2.0, AccurateMath.atan2(Double.POSITIVE_INFINITY, 0.1), Precision.EPSILON);
-        assertEquals("atan2(Inf, -0.1) should be PI/2", AccurateMath.PI / 2.0, AccurateMath.atan2(Double.POSITIVE_INFINITY, -0.1), Precision.EPSILON);
-        assertEquals("atan2(-0.1, 0.0) should be -PI/2", -AccurateMath.PI / 2.0, AccurateMath.atan2(-0.1, 0.0), Precision.EPSILON);
-        assertEquals("atan2(-0.1, -0.0) should be -PI/2", -AccurateMath.PI / 2.0, AccurateMath.atan2(-0.1, -0.0), Precision.EPSILON);
-        assertEquals("atan2(-Inf, 0.1) should be -PI/2", -AccurateMath.PI / 2.0, AccurateMath.atan2(Double.NEGATIVE_INFINITY, 0.1), Precision.EPSILON);
-        assertEquals("atan2(-Inf, -0.1) should be -PI/2", -AccurateMath.PI / 2.0, AccurateMath.atan2(Double.NEGATIVE_INFINITY, -0.1), Precision.EPSILON);
-        assertEquals("atan2(Inf, Inf) should be PI/4", AccurateMath.PI / 4.0, AccurateMath.atan2(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY),
-                     Precision.EPSILON);
-        assertEquals("atan2(Inf, -Inf) should be PI * 3/4", AccurateMath.PI * 3.0 / 4.0,
-                     AccurateMath.atan2(Double.POSITIVE_INFINITY, Double.NEGATIVE_INFINITY), Precision.EPSILON);
-        assertEquals("atan2(-Inf, Inf) should be -PI/4", -AccurateMath.PI / 4.0, AccurateMath.atan2(Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY),
-                     Precision.EPSILON);
-        assertEquals("atan2(-Inf, -Inf) should be -PI * 3/4", -AccurateMath.PI * 3.0 / 4.0,
-                     AccurateMath.atan2(Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY), Precision.EPSILON);
+
+        final double pinf = Double.POSITIVE_INFINITY;
+        final double ninf = Double.NEGATIVE_INFINITY;
+        // Test using fractions of pi
+        assertAtan2(+0.0,  0.0,  0.0, 1.0);
+        assertAtan2(+0.0, -0.0,  1.0, 1.0);
+        assertAtan2(+0.0,  0.1,  0.0, 1.0);
+        assertAtan2(+0.0, -0.1,  1.0, 1.0);
+        assertAtan2(+0.0, pinf,  0.0, 1.0);
+        assertAtan2(+0.0, ninf,  1.0, 1.0);
+        assertAtan2(-0.0,  0.0, -0.0, 1.0);
+        assertAtan2(-0.0, -0.0, -1.0, 1.0);
+        assertAtan2(-0.0,  0.1, -0.0, 1.0);
+        assertAtan2(-0.0, -0.1, -1.0, 1.0);
+        assertAtan2(-0.0, pinf, -0.0, 1.0);
+        assertAtan2(-0.0, ninf, -1.0, 1.0);
+        assertAtan2(+0.1,  0.0,  1.0, 2.0);
+        assertAtan2(+0.1, -0.0,  1.0, 2.0);
+        assertAtan2(+0.1,  0.1,  1.0, 4.0);
+        assertAtan2(+0.1, -0.1,  3.0, 4.0);
+        assertAtan2(+0.1, pinf,  0.0, 1.0);
+        assertAtan2(+0.1, ninf,  1.0, 1.0);
+        assertAtan2(-0.1,  0.0, -1.0, 2.0);
+        assertAtan2(-0.1, -0.0, -1.0, 2.0);
+        assertAtan2(-0.1,  0.1, -1.0, 4.0);
+        assertAtan2(-0.1, -0.1, -3.0, 4.0);
+        assertAtan2(-0.1, pinf, -0.0, 1.0);
+        assertAtan2(-0.1, ninf, -1.0, 1.0);
+        assertAtan2(pinf,  0.0,  1.0, 2.0);
+        assertAtan2(pinf, -0.0,  1.0, 2.0);
+        assertAtan2(pinf,  0.1,  1.0, 2.0);
+        assertAtan2(pinf, -0.1,  1.0, 2.0);
+        assertAtan2(pinf, pinf,  1.0, 4.0);
+        assertAtan2(pinf, ninf,  3.0, 4.0);
+        assertAtan2(ninf,  0.0, -1.0, 2.0);
+        assertAtan2(ninf, -0.0, -1.0, 2.0);
+        assertAtan2(ninf,  0.1, -1.0, 2.0);
+        assertAtan2(ninf, -0.1, -1.0, 2.0);
+        assertAtan2(ninf, pinf, -1.0, 4.0);
+        assertAtan2(ninf, ninf, -3.0, 4.0);
+    }
+
+    /**
+     * Assert the atan2(y, x) value is a fraction of pi.
+     *
+     * @param y ordinate
+     * @param x abscissa
+     * @param numerator numerator of the fraction of pi (including the sign)
+     * @param denominator denominator of the fraction of pi
+     */
+    private static void assertAtan2(double y, double x, double numerator, double denominator) {
+        final double v = AccurateMath.atan2(y, x);
+        if (numerator == 0) {
+            // Exact including the sign.
+            Assertions.assertEquals(numerator, v,
+                () -> String.format("atan2(%s, %s) should be %s but was %s", y, x, numerator, v));
+        } else {
+            final double expected = AccurateMath.PI * numerator / denominator;
+            Assertions.assertEquals(expected, v, Precision.EPSILON,
+                () -> String.format("atan2(%s, %s) should be pi * %s / %s", y, x, numerator, denominator));
+        }
     }
 
     @Test
@@ -1258,34 +1292,6 @@ public class AccurateMathTest {
         assertEquals(Float.NEGATIVE_INFINITY, AccurateMath.scalb(-3.4028235E38f, 2147483647), 0F);
     }
 
-    private boolean compareClassMethods(Class<?> class1, Class<?> class2) {
-        boolean allfound = true;
-        for (Method method1 : class1.getDeclaredMethods()) {
-            if (Modifier.isPublic(method1.getModifiers())) {
-                Type[] params = method1.getGenericParameterTypes();
-                try {
-                    class2.getDeclaredMethod(method1.getName(), (Class[]) params);
-                } catch (NoSuchMethodException e) {
-                    allfound = false;
-                    System.out.println(class2.getSimpleName() + " does not implement: " + method1);
-                }
-            }
-        }
-        return allfound;
-    }
-
-    @Test
-    public void checkMissingAccurateMathClasses() {
-        boolean ok = compareClassMethods(StrictMath.class, AccurateMath.class);
-        assertTrue("AccurateMath should implement all StrictMath methods", ok);
-    }
-
-    @Ignore
-    @Test
-    public void checkExtraAccurateMathClasses() {
-        compareClassMethods(AccurateMath.class, StrictMath.class);
-    }
-
     @Test
     public void testSignumDouble() {
         final double delta = 0.0;
@@ -1433,12 +1439,12 @@ public class AccurateMathTest {
         // Note: Long.MAX_VALUE isn't actually an infinity, so its parity affects the sign of resulting zero.
         for (double d : DOUBLES) {
             if (Math.abs(d) > 1.0) {
-                assertTrue(AccurateMath.pow(d, Long.MIN_VALUE + 1L) == 0.0);
+                assertEquals(0.0, AccurateMath.pow(d, Long.MIN_VALUE + 1L), 0.0);
             }
         }
         for (double d : DOUBLES) {
             if (Math.abs(d) < 1.0) {
-                assertTrue(AccurateMath.pow(d, Long.MAX_VALUE) == 0.0);
+                assertEquals(0.0, AccurateMath.pow(d, Long.MAX_VALUE), 0.0);
             }
         }
         // If the absolute value of the first argument equals 1 and the second argument is infinite, then the result is NaN. <- Impossible with int.
@@ -1550,7 +1556,7 @@ public class AccurateMathTest {
                 try {
                     AccurateMath.incrementExact(a);
                     Assert.fail("an exception should have been thrown");
-                } catch (MathArithmeticException mae) {
+                } catch (ArithmeticException mae) {
                     // expected
                 }
             } else {
@@ -1576,7 +1582,7 @@ public class AccurateMathTest {
                 try {
                     AccurateMath.decrementExact(a);
                     fail("an exception should have been thrown");
-                } catch (MathArithmeticException mae) {
+                } catch (ArithmeticException mae) {
                     // expected
                 }
             } else {
@@ -1604,7 +1610,7 @@ public class AccurateMathTest {
                     try {
                         AccurateMath.addExact(a, b);
                         fail("an exception should have been thrown");
-                    } catch (MathArithmeticException mae) {
+                    } catch (ArithmeticException mae) {
                         // expected
                     }
                 } else {
@@ -1633,7 +1639,7 @@ public class AccurateMathTest {
                     try {
                         AccurateMath.addExact(a, b);
                         fail("an exception should have been thrown");
-                    } catch (MathArithmeticException mae) {
+                    } catch (ArithmeticException mae) {
                         // expected
                     }
                 } else {
@@ -1662,7 +1668,7 @@ public class AccurateMathTest {
                     try {
                         AccurateMath.subtractExact(a, b);
                         fail("an exception should have been thrown");
-                    } catch (MathArithmeticException mae) {
+                    } catch (ArithmeticException mae) {
                         // expected
                     }
                 } else {
@@ -1691,7 +1697,7 @@ public class AccurateMathTest {
                     try {
                         AccurateMath.subtractExact(a, b);
                         fail("an exception should have been thrown");
-                    } catch (MathArithmeticException mae) {
+                    } catch (ArithmeticException mae) {
                         // expected
                     }
                 } else {
@@ -1720,7 +1726,7 @@ public class AccurateMathTest {
                     try {
                         AccurateMath.multiplyExact(a, b);
                         fail("an exception should have been thrown " + a + b);
-                    } catch (MathArithmeticException mae) {
+                    } catch (ArithmeticException mae) {
                         // expected
                     }
                 } else {
@@ -1749,7 +1755,7 @@ public class AccurateMathTest {
                     try {
                         AccurateMath.multiplyExact(a, b);
                         fail("an exception should have been thrown " + a + b);
-                    } catch (MathArithmeticException mae) {
+                    } catch (ArithmeticException mae) {
                         // expected
                     }
                 } else {
@@ -1759,12 +1765,12 @@ public class AccurateMathTest {
         }
     }
 
-    @Test(expected = MathArithmeticException.class)
+    @Test(expected = ArithmeticException.class)
     public void testToIntExactTooLow() {
         AccurateMath.toIntExact(-1L + Integer.MIN_VALUE);
     }
 
-    @Test(expected = MathArithmeticException.class)
+    @Test(expected = ArithmeticException.class)
     public void testToIntExactTooHigh() {
         AccurateMath.toIntExact(+1L + Integer.MAX_VALUE);
     }
@@ -1787,7 +1793,7 @@ public class AccurateMathTest {
         try {
             AccurateMath.floorDiv(1, 0);
             fail("an exception should have been thrown");
-        } catch (MathArithmeticException mae) {
+        } catch (ArithmeticException mae) {
             // expected
         }
         for (int a = -100; a <= 100; ++a) {
@@ -1808,7 +1814,7 @@ public class AccurateMathTest {
         try {
             AccurateMath.floorMod(1, 0);
             fail("an exception should have been thrown");
-        } catch (MathArithmeticException mae) {
+        } catch (ArithmeticException mae) {
             // expected
         }
         for (int a = -100; a <= 100; ++a) {
@@ -1830,7 +1836,7 @@ public class AccurateMathTest {
                 try {
                     AccurateMath.floorDiv(a, b);
                     fail("an exception should have been thrown");
-                } catch (MathArithmeticException mae) {
+                } catch (ArithmeticException mae) {
                     // expected
                 }
             } else {
@@ -1859,7 +1865,7 @@ public class AccurateMathTest {
         try {
             AccurateMath.floorDiv(1L, 0L);
             fail("an exception should have been thrown");
-        } catch (MathArithmeticException mae) {
+        } catch (ArithmeticException mae) {
             // expected
         }
         for (long a = -100L; a <= 100L; ++a) {
@@ -1880,7 +1886,7 @@ public class AccurateMathTest {
         try {
             AccurateMath.floorMod(1L, 0L);
             fail("an exception should have been thrown");
-        } catch (MathArithmeticException mae) {
+        } catch (ArithmeticException mae) {
             // expected
         }
         for (long a = -100L; a <= 100L; ++a) {
@@ -1902,7 +1908,7 @@ public class AccurateMathTest {
                 try {
                     AccurateMath.floorDiv(a, b);
                     fail("an exception should have been thrown");
-                } catch (MathArithmeticException mae) {
+                } catch (ArithmeticException mae) {
                     // expected
                 }
             } else {
@@ -1962,8 +1968,8 @@ public class AccurateMathTest {
 
         x = 4503599627370497.0; // x = Math.pow(2, 52) + 1;
         assertEquals("4503599627370497", new BigDecimal(x).toString());
-        assertTrue(x == Math.rint(x));
-        assertTrue(x == AccurateMath.round(x));
+        assertEquals(x, Math.rint(x), 0.0);
+        assertEquals(x, AccurateMath.round(x), 0.0);
         //assertTrue(x == Math.round(x)); // fails with Java 7, fixed in Java 8
     }
 

@@ -24,7 +24,7 @@ import org.apache.commons.math4.legacy.exception.MathIllegalArgumentException;
 import org.apache.commons.math4.legacy.exception.OutOfRangeException;
 import org.apache.commons.rng.UniformRandomProvider;
 import org.apache.commons.rng.simple.RandomSource;
-import org.apache.commons.math4.legacy.core.jdkmath.AccurateMath;
+import org.apache.commons.math4.core.jdkmath.JdkMath;
 import org.apache.commons.numbers.core.Precision;
 import org.junit.Assert;
 import org.junit.Test;
@@ -360,8 +360,8 @@ public final class BicubicInterpolatingFunctionTest {
         }
 
         final UniformRandomProvider rng = RandomSource.WELL_19937_C.create(1234567L);
-        final ContinuousDistribution.Sampler distX = new UniformContinuousDistribution(xValues[0], xValues[xValues.length - 1]).createSampler(rng);
-        final ContinuousDistribution.Sampler distY = new UniformContinuousDistribution(yValues[0], yValues[yValues.length - 1]).createSampler(rng);
+        final ContinuousDistribution.Sampler distX = UniformContinuousDistribution.of(xValues[0], xValues[xValues.length - 1]).createSampler(rng);
+        final ContinuousDistribution.Sampler distY = UniformContinuousDistribution.of(yValues[0], yValues[yValues.length - 1]).createSampler(rng);
 
         double sumError = 0;
         for (int i = 0; i < numberOfSamples; i++) {
@@ -374,7 +374,7 @@ public final class BicubicInterpolatingFunctionTest {
             }
 
             actual = interpolation.value(currentX, currentY);
-            sumError += AccurateMath.abs(actual - expected);
+            sumError += JdkMath.abs(actual - expected);
 
             if (print) {
                 System.out.println(actual + " (diff=" + (expected - actual) + ")");

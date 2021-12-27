@@ -21,7 +21,7 @@ import org.apache.commons.math4.legacy.TestUtils;
 import org.apache.commons.math4.legacy.exception.MathIllegalArgumentException;
 import org.apache.commons.math4.legacy.exception.NullArgumentException;
 import org.apache.commons.math4.legacy.stat.descriptive.DescriptiveStatistics;
-import org.apache.commons.math4.legacy.core.jdkmath.AccurateMath;
+import org.apache.commons.math4.core.jdkmath.JdkMath;
 import org.apache.commons.numbers.core.Precision;
 import org.junit.Assert;
 import org.junit.Test;
@@ -70,12 +70,8 @@ public final class StatUtilsTest {
 
         values = new double[] { ONE };
 
-        Assert.assertTrue(
-            "Mean of n = 1 set should be value of single item n1",
-            StatUtils.mean(values) == ONE);
-        Assert.assertTrue(
-            "Variance of n = 1 set should be zero",
-            StatUtils.variance(values) == 0);
+        Assert.assertEquals("Mean of n = 1 set should be value of single item n1", ONE, StatUtils.mean(values), 0.0);
+        Assert.assertEquals("Variance of n = 1 set should be zero", 0, StatUtils.variance(values), 0.0);
     }
 
     @Test
@@ -210,13 +206,13 @@ public final class StatUtilsTest {
 
         // test one
         x = new double[] {TWO};
-        TestUtils.assertEquals(AccurateMath.log(TWO), StatUtils.sumLog(x), TOLERANCE);
-        TestUtils.assertEquals(AccurateMath.log(TWO), StatUtils.sumLog(x, 0, 1), TOLERANCE);
+        TestUtils.assertEquals(JdkMath.log(TWO), StatUtils.sumLog(x), TOLERANCE);
+        TestUtils.assertEquals(JdkMath.log(TWO), StatUtils.sumLog(x, 0, 1), TOLERANCE);
 
         // test many
         x = new double[] {ONE, TWO, TWO, THREE};
-        TestUtils.assertEquals(AccurateMath.log(ONE) + 2.0 * AccurateMath.log(TWO) + AccurateMath.log(THREE), StatUtils.sumLog(x), TOLERANCE);
-        TestUtils.assertEquals(2.0 * AccurateMath.log(TWO), StatUtils.sumLog(x, 1, 2), TOLERANCE);
+        TestUtils.assertEquals(JdkMath.log(ONE) + 2.0 * JdkMath.log(TWO) + JdkMath.log(THREE), StatUtils.sumLog(x), TOLERANCE);
+        TestUtils.assertEquals(2.0 * JdkMath.log(TWO), StatUtils.sumLog(x, 1, 2), TOLERANCE);
     }
 
     @Test
@@ -457,9 +453,9 @@ public final class StatUtilsTest {
             // expected
         }
         test = new double[] {2, 4, 6, 8};
-        Assert.assertEquals(AccurateMath.exp(0.25d * StatUtils.sumLog(test)),
+        Assert.assertEquals(JdkMath.exp(0.25d * StatUtils.sumLog(test)),
                 StatUtils.geometricMean(test), Double.MIN_VALUE);
-        Assert.assertEquals(AccurateMath.exp(0.5 * StatUtils.sumLog(test, 0, 2)),
+        Assert.assertEquals(JdkMath.exp(0.5 * StatUtils.sumLog(test, 0, 2)),
                 StatUtils.geometricMean(test, 0, 2), Double.MIN_VALUE);
     }
 
@@ -471,7 +467,7 @@ public final class StatUtilsTest {
     @Test
     public void testNormalize1() {
         double sample[] = { 50, 100 };
-        double expectedSample[] = { -25 / AccurateMath.sqrt(1250), 25 / AccurateMath.sqrt(1250) };
+        double expectedSample[] = { -25 / JdkMath.sqrt(1250), 25 / JdkMath.sqrt(1250) };
         double[] out = StatUtils.normalize(sample);
         for (int i = 0; i < out.length; i++) {
             Assert.assertTrue(Precision.equals(out[i], expectedSample[i], 1));
@@ -490,7 +486,7 @@ public final class StatUtilsTest {
         int length = 77;
         double sample[] = new double[length];
         for (int i = 0; i < length; i++) {
-            sample[i] = AccurateMath.random();
+            sample[i] = JdkMath.random();
         }
         // normalize this sample
         double standardizedSample[] = StatUtils.normalize(sample);

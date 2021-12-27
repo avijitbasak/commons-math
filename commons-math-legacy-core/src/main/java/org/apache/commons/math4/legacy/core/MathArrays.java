@@ -35,7 +35,7 @@ import org.apache.commons.math4.legacy.exception.NotStrictlyPositiveException;
 import org.apache.commons.math4.legacy.exception.NullArgumentException;
 import org.apache.commons.math4.legacy.exception.NumberIsTooLargeException;
 import org.apache.commons.math4.legacy.exception.util.LocalizedFormats;
-import org.apache.commons.math4.legacy.core.jdkmath.AccurateMath;
+import org.apache.commons.math4.core.jdkmath.JdkMath;
 
 /**
  * Arrays utilities.
@@ -192,7 +192,7 @@ public final class MathArrays {
         checkEqualLength(p1, p2);
         double sum = 0;
         for (int i = 0; i < p1.length; i++) {
-            sum += AccurateMath.abs(p1[i] - p2[i]);
+            sum += JdkMath.abs(p1[i] - p2[i]);
         }
         return sum;
     }
@@ -209,7 +209,7 @@ public final class MathArrays {
         checkEqualLength(p1, p2);
         int sum = 0;
         for (int i = 0; i < p1.length; i++) {
-            sum += AccurateMath.abs(p1[i] - p2[i]);
+            sum += JdkMath.abs(p1[i] - p2[i]);
         }
         return sum;
     }
@@ -229,7 +229,7 @@ public final class MathArrays {
             final double dp = p1[i] - p2[i];
             sum += dp * dp;
         }
-        return AccurateMath.sqrt(sum);
+        return JdkMath.sqrt(sum);
     }
 
     /**
@@ -244,10 +244,10 @@ public final class MathArrays {
         checkEqualLength(p1, p2);
         double sum = 0;
         for (int i = 0; i < p1.length; i++) {
-            final double dp = p1[i] - p2[i];
+            final double dp = (double) p1[i] - p2[i];
             sum += dp * dp;
         }
-        return AccurateMath.sqrt(sum);
+        return JdkMath.sqrt(sum);
     }
 
     /**
@@ -262,7 +262,7 @@ public final class MathArrays {
         checkEqualLength(p1, p2);
         double max = 0;
         for (int i = 0; i < p1.length; i++) {
-            max = AccurateMath.max(max, AccurateMath.abs(p1[i] - p2[i]));
+            max = JdkMath.max(max, JdkMath.abs(p1[i] - p2[i]));
         }
         return max;
     }
@@ -279,7 +279,7 @@ public final class MathArrays {
         checkEqualLength(p1, p2);
         int max = 0;
         for (int i = 0; i < p1.length; i++) {
-            max = AccurateMath.max(max, AccurateMath.abs(p1[i] - p2[i]));
+            max = JdkMath.max(max, JdkMath.abs(p1[i] - p2[i]));
         }
         return max;
     }
@@ -845,7 +845,7 @@ public final class MathArrays {
         // straightforward implementation of the convolution sum
         for (int n = 0; n < totalLength; n++) {
             double yn = 0;
-            int k = AccurateMath.max(0, n + 1 - xLen);
+            int k = JdkMath.max(0, n + 1 - xLen);
             int j = n - k;
             while (k < hLen && j >= 0) {
                 yn += x[j--] * h[k++];
@@ -968,6 +968,7 @@ public final class MathArrays {
      *     <li>the weights array contains one or more infinite values</li>
      *     <li>the weights array contains one or more NaN values</li>
      *     <li>the weights array contains negative values</li>
+     *     <li>the weights array does not contain at least one non-zero value (applies when length is non zero)</li>
      *     <li>the start and length arguments do not determine a valid array</li></ul>
      * </li>
      * <li>returns <code>false</code> if the array is non-null, but
@@ -1004,6 +1005,7 @@ public final class MathArrays {
      *     <li>the weights array contains one or more infinite values</li>
      *     <li>the weights array contains one or more NaN values</li>
      *     <li>the weights array contains negative values</li>
+     *     <li>the weights array does not contain at least one non-zero value (applies when length is non zero)</li>
      *     <li>the start and length arguments do not determine a valid array</li></ul>
      * </li>
      * <li>returns <code>false</code> if the array is non-null, but
@@ -1031,27 +1033,29 @@ public final class MathArrays {
 
         checkEqualLength(weights, values);
 
-        boolean containsPositiveWeight = false;
-        for (int i = begin; i < begin + length; i++) {
-            final double weight = weights[i];
-            if (Double.isNaN(weight)) {
-                throw new MathIllegalArgumentException(LocalizedFormats.NAN_ELEMENT_AT_INDEX, Integer.valueOf(i));
+        if (length != 0) {
+            boolean containsPositiveWeight = false;
+            for (int i = begin; i < begin + length; i++) {
+                final double weight = weights[i];
+                if (Double.isNaN(weight)) {
+                    throw new MathIllegalArgumentException(LocalizedFormats.NAN_ELEMENT_AT_INDEX, Integer.valueOf(i));
+                }
+                if (Double.isInfinite(weight)) {
+                    throw new MathIllegalArgumentException(LocalizedFormats.INFINITE_ARRAY_ELEMENT,
+                        Double.valueOf(weight), Integer.valueOf(i));
+                }
+                if (weight < 0) {
+                    throw new MathIllegalArgumentException(LocalizedFormats.NEGATIVE_ELEMENT_AT_INDEX,
+                        Integer.valueOf(i), Double.valueOf(weight));
+                }
+                if (!containsPositiveWeight && weight > 0.0) {
+                    containsPositiveWeight = true;
+                }
             }
-            if (Double.isInfinite(weight)) {
-                throw new MathIllegalArgumentException(LocalizedFormats.INFINITE_ARRAY_ELEMENT,
-                    Double.valueOf(weight), Integer.valueOf(i));
-            }
-            if (weight < 0) {
-                throw new MathIllegalArgumentException(LocalizedFormats.NEGATIVE_ELEMENT_AT_INDEX,
-                    Integer.valueOf(i), Double.valueOf(weight));
-            }
-            if (!containsPositiveWeight && weight > 0.0) {
-                containsPositiveWeight = true;
-            }
-        }
 
-        if (!containsPositiveWeight) {
-            throw new MathIllegalArgumentException(LocalizedFormats.WEIGHT_AT_LEAST_ONE_NON_ZERO);
+            if (!containsPositiveWeight) {
+                throw new MathIllegalArgumentException(LocalizedFormats.WEIGHT_AT_LEAST_ONE_NON_ZERO);
+            }
         }
 
         return verifyValues(values, begin, length, allowEmpty);

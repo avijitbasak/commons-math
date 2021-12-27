@@ -28,7 +28,6 @@ import org.apache.commons.rng.sampling.distribution.ContinuousSampler;
 import org.apache.commons.rng.sampling.distribution.ContinuousUniformSampler;
 import org.apache.commons.math4.legacy.analysis.MultivariateFunction;
 import org.apache.commons.math4.legacy.optim.PointValuePair;
-import org.apache.commons.math4.legacy.optim.OptimizationData;
 
 /**
  * DSSA algorithm.
@@ -54,8 +53,7 @@ import org.apache.commons.math4.legacy.optim.OptimizationData;
  * "SSA" algorithm in the above paper.
  */
 public class HedarFukushimaTransform
-    implements Simplex.TransformFactory,
-               OptimizationData {
+    implements Simplex.TransformFactory {
     /** Shrinkage coefficient. */
     private final double sigma;
     /** Sampler for reflection coefficient. */
@@ -206,5 +204,11 @@ public class HedarFukushimaTransform
                                 -alpha,
                                 point.getPoint(),
                                 eval);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public String toString() {
+        return "Hedar-Fukushima [s=" + sigma + "]";
     }
 }

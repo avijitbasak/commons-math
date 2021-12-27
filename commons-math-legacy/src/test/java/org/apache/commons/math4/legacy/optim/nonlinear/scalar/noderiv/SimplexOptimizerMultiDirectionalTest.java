@@ -19,16 +19,13 @@ package org.apache.commons.math4.legacy.optim.nonlinear.scalar.noderiv;
 
 import java.util.Arrays;
 import org.apache.commons.math4.legacy.analysis.MultivariateFunction;
-import org.apache.commons.math4.legacy.exception.MathUnsupportedOperationException;
 import org.apache.commons.math4.legacy.optim.InitialGuess;
 import org.apache.commons.math4.legacy.optim.MaxEval;
 import org.apache.commons.math4.legacy.optim.PointValuePair;
-import org.apache.commons.math4.legacy.optim.SimpleBounds;
 import org.apache.commons.math4.legacy.optim.nonlinear.scalar.GoalType;
 import org.apache.commons.math4.legacy.optim.nonlinear.scalar.ObjectiveFunction;
-import org.apache.commons.math4.legacy.optim.nonlinear.scalar.TestFunction;
 import org.apache.commons.math4.legacy.core.MathArrays;
-import org.apache.commons.math4.legacy.core.jdkmath.AccurateMath;
+import org.apache.commons.math4.core.jdkmath.JdkMath;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.Ignore;
@@ -38,21 +35,6 @@ import org.junit.Ignore;
  */
 public class SimplexOptimizerMultiDirectionalTest {
     private static final int DIM = 13;
-
-    @Test(expected=MathUnsupportedOperationException.class)
-    public void testBoundsUnsupported() {
-        SimplexOptimizer optimizer = new SimplexOptimizer(1e-10, 1e-30);
-        final OptimTestUtils.FourExtrema fourExtrema = new OptimTestUtils.FourExtrema();
-
-        optimizer.optimize(new MaxEval(100),
-                           new ObjectiveFunction(fourExtrema),
-                           GoalType.MINIMIZE,
-                           new InitialGuess(new double[] { -3, 0 }),
-                           Simplex.alongAxes(new double[] { 0.2, 0.2 }),
-                           new MultiDirectionalTransform(),
-                           new SimpleBounds(new double[] { -5, -1 },
-                                            new double[] { 5, 1 }));
-    }
 
     @Test
     public void testMath283() {
@@ -120,48 +102,6 @@ public class SimplexOptimizerMultiDirectionalTest {
                1e-6);
     }
 
-    @Test
-    public void testRosenbrock() {
-        final int dim = 2;
-        doTest(TestFunction.ROSENBROCK.withDimension(dim),
-               OptimTestUtils.point(new double[] { -1.2, 1 }, 1e-1),
-               GoalType.MINIMIZE,
-               190,
-               new PointValuePair(OptimTestUtils.point(dim, 1.0), 0.0),
-               1e-4);
-    }
-
-    @Test
-    public void testPowell() {
-        final int dim = 4;
-        doTest(TestFunction.POWELL.withDimension(dim),
-               OptimTestUtils.point(new double[] { 3, -1, 0, 1 }, 1e-1),
-               GoalType.MINIMIZE,
-               420,
-               new PointValuePair(OptimTestUtils.point(dim, 0.0), 0.0),
-               2e-4);
-    }
-
-    @Test
-    public void testRosen() {
-        doTest(TestFunction.ROSEN.withDimension(DIM),
-               OptimTestUtils.point(DIM, 0.1),
-               GoalType.MINIMIZE,
-               186915,
-               new PointValuePair(OptimTestUtils.point(DIM, 1.0), 0.0),
-               1e-4);
-    }
-
-    @Ignore("See MATH-1552")@Test
-    public void testEllipse() {
-        doTest(TestFunction.ELLI.withDimension(DIM),
-               OptimTestUtils.point(DIM, 1.0, 1e-1),
-               GoalType.MINIMIZE,
-               911,
-               new PointValuePair(OptimTestUtils.point(DIM, 0.0), 0.0),
-               1e-9);
-     }
-
     @Ignore("See MATH-1552")@Test
     public void testElliRotated() {
         doTest(new OptimTestUtils.ElliRotated(),
@@ -170,97 +110,6 @@ public class SimplexOptimizerMultiDirectionalTest {
                911,
                new PointValuePair(OptimTestUtils.point(DIM, 0.0), 0.0),
                1e-9);
-    }
-
-    @Test
-    public void testCigar() {
-        doTest(TestFunction.CIGAR.withDimension(DIM),
-               OptimTestUtils.point(DIM, 1.0, 1e-1),
-               GoalType.MINIMIZE,
-               7000,
-               new PointValuePair(OptimTestUtils.point(DIM,0.0), 0.0),
-               1e-6);
-    }
-
-    @Ignore("See MATH-1552")@Test
-    public void testTwoAxes() {
-        doTest(TestFunction.TWO_AXES.withDimension(DIM),
-               OptimTestUtils.point(DIM, 1.0, 1e-1),
-               GoalType.MINIMIZE,
-               1219,
-               new PointValuePair(OptimTestUtils.point(DIM, 0.0), 0.0),
-               1e-12);
-     }
-
-    @Ignore("See MATH-1552")@Test
-    public void testCigTab() {
-        doTest(TestFunction.CIG_TAB.withDimension(DIM),
-               OptimTestUtils.point(DIM, 1.0, 1e-1),
-               GoalType.MINIMIZE,
-               827,
-               new PointValuePair(OptimTestUtils.point(DIM, 0.0), 0.0),
-               1e-8);
-     }
-
-    @Test
-    public void testSphere() {
-        doTest(TestFunction.SPHERE.withDimension(DIM),
-               OptimTestUtils.point(DIM, 1.0, 1e-1),
-               GoalType.MINIMIZE,
-               2580,
-               new PointValuePair(OptimTestUtils.point(DIM, 0.0), 0.0),
-               1e-6);
-    }
-
-    @Ignore("See MATH-1552")@Test
-    public void testTablet() {
-        doTest(TestFunction.TABLET.withDimension(DIM),
-               OptimTestUtils.point(DIM, 1.0, 1e-1),
-               GoalType.MINIMIZE,
-               911,
-               new PointValuePair(OptimTestUtils.point(DIM, 0.0), 0.0),
-               1e-9);
-    }
-
-    @Ignore("See MATH-1552")@Test
-    public void testDiffPow() {
-        doTest(TestFunction.DIFF_POW.withDimension(DIM),
-               OptimTestUtils.point(DIM, 1.0, 1e-1),
-               GoalType.MINIMIZE,
-               631,
-               new PointValuePair(OptimTestUtils.point(DIM, 0.0), 0.0),
-               1e-14);
-    }
-
-    @Test
-    public void testSsDiffPow() {
-        final int dim = DIM / 2;
-        doTest(TestFunction.SS_DIFF_POW.withDimension(dim),
-               OptimTestUtils.point(dim, 1.0, 1e-1),
-               GoalType.MINIMIZE,
-               4000,
-               new PointValuePair(OptimTestUtils.point(dim, 0.0), 0.0),
-               1e-3);
-    }
-
-    @Ignore("See MATH-1552")@Test
-    public void testAckley() {
-        doTest(TestFunction.ACKLEY.withDimension(DIM),
-               OptimTestUtils.point(DIM, 1.0, 1e-1),
-               GoalType.MINIMIZE,
-               7900,
-               new PointValuePair(OptimTestUtils.point(DIM, 0.0), 0d),
-               1e-11);
-    }
-
-    @Ignore("See MATH-1552")@Test
-    public void testRastrigin() {
-        doTest(TestFunction.RASTRIGIN.withDimension(DIM),
-               OptimTestUtils.point(DIM, 1.0, 2e-1),
-               GoalType.MINIMIZE,
-               4600,
-               new PointValuePair(OptimTestUtils.point(DIM, 0.0), 0d),
-               1e-6);
     }
 
     /**
@@ -349,7 +198,7 @@ public class SimplexOptimizerMultiDirectionalTest {
             final double x = point[0];
             final double y = point[1];
             final double twoS2 = 2.0 * std * std;
-            return 1.0 / (twoS2 * AccurateMath.PI) * AccurateMath.exp(-(x * x + y * y) / twoS2);
+            return 1.0 / (twoS2 * JdkMath.PI) * JdkMath.exp(-(x * x + y * y) / twoS2);
         }
     }
 }

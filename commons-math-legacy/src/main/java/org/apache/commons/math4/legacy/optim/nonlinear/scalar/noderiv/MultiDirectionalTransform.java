@@ -24,14 +24,12 @@ import java.util.function.DoublePredicate;
 
 import org.apache.commons.math4.legacy.analysis.MultivariateFunction;
 import org.apache.commons.math4.legacy.optim.PointValuePair;
-import org.apache.commons.math4.legacy.optim.OptimizationData;
 
 /**
- * Multi-directional search method.
+ * <a href="https://scholarship.rice.edu/handle/1911/16304">Multi-directional</a> search method.
  */
 public class MultiDirectionalTransform
-    implements Simplex.TransformFactory,
-               OptimizationData {
+    implements Simplex.TransformFactory {
     /** Reflection coefficient. */
     private static final double ALPHA = 1;
     /** Default value for {@link #gamma}: {@value}. */
@@ -73,7 +71,7 @@ public class MultiDirectionalTransform
     @Override
     public UnaryOperator<Simplex> create(final MultivariateFunction evaluationFunction,
                                          final Comparator<PointValuePair> comparator,
-                                         final DoublePredicate unused) {
+                                         final DoublePredicate sa) {
         return original -> {
             final PointValuePair best = original.get(0);
 
@@ -92,9 +90,13 @@ public class MultiDirectionalTransform
                                                           evaluationFunction);
                 final PointValuePair expandedBest = expandedSimplex.get(0);
 
-                return comparator.compare(reflectedBest, expandedBest) < 0 ?
-                    reflectedSimplex :
-                    expandedSimplex;
+                if (comparator.compare(expandedBest, reflectedBest) <= 0 ||
+                    (sa != null &&
+                     sa.test(expandedBest.getValue() - reflectedBest.getValue()))) {
+                    return expandedSimplex;
+                } else {
+                    return reflectedSimplex;
+                }
             } else {
                 // Compute the contracted simplex.
                 return original.shrink(sigma, evaluationFunction);
@@ -130,5 +132,12 @@ public class MultiDirectionalTransform
         }
 
         return original.replaceLast(replacement).evaluate(evalFunc, comp);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public String toString() {
+        return "Multidirectional [g=" + gamma +
+            " s=" + sigma + "]";
     }
 }

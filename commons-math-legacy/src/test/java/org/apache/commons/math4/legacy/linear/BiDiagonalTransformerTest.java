@@ -17,7 +17,7 @@
 
 package org.apache.commons.math4.legacy.linear;
 
-import org.apache.commons.math4.legacy.core.jdkmath.AccurateMath;
+import org.apache.commons.math4.core.jdkmath.JdkMath;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -124,9 +124,9 @@ public class BiDiagonalTransformerTest {
                 { 2.0, 3.0, 4.0 },
                 { 3.0, 5.0, 7.0 }
             }));
-       final double s3  = AccurateMath.sqrt(3.0);
-       final double s14 = AccurateMath.sqrt(14.0);
-       final double s1553 = AccurateMath.sqrt(1553.0);
+       final double s3  = JdkMath.sqrt(3.0);
+       final double s14 = JdkMath.sqrt(14.0);
+       final double s1553 = JdkMath.sqrt(1553.0);
        RealMatrix uRef = MatrixUtils.createRealMatrix(new double[][] {
            {  -1.0 / s14,  5.0 / (s3 * s14),  1.0 / s3 },
            {  -2.0 / s14, -4.0 / (s3 * s14),  1.0 / s3 },
@@ -152,9 +152,9 @@ public class BiDiagonalTransformerTest {
        Assert.assertEquals(0, v.subtract(vRef).getNorm(), 1.0e-14);
 
        // check the same cached instance is returned the second time
-       Assert.assertTrue(u == transformer.getU());
-       Assert.assertTrue(b == transformer.getB());
-       Assert.assertTrue(v == transformer.getV());
+        Assert.assertSame(u, transformer.getU());
+        Assert.assertSame(b, transformer.getB());
+        Assert.assertSame(v, transformer.getV());
 
     }
 
@@ -162,7 +162,7 @@ public class BiDiagonalTransformerTest {
     public void testMatricesValues() {
        BiDiagonalTransformer transformer =
             new BiDiagonalTransformer(MatrixUtils.createRealMatrix(testSquare));
-       final double s17 = AccurateMath.sqrt(17.0);
+       final double s17 = JdkMath.sqrt(17.0);
         RealMatrix uRef = MatrixUtils.createRealMatrix(new double[][] {
                 {  -8 / (5 * s17), 19 / (5 * s17) },
                 { -19 / (5 * s17), -8 / (5 * s17) }
@@ -185,9 +185,9 @@ public class BiDiagonalTransformerTest {
         Assert.assertEquals(0, v.subtract(vRef).getNorm(), 1.0e-14);
 
         // check the same cached instance is returned the second time
-        Assert.assertTrue(u == transformer.getU());
-        Assert.assertTrue(b == transformer.getB());
-        Assert.assertTrue(v == transformer.getV());
+        Assert.assertSame(u, transformer.getU());
+        Assert.assertSame(b, transformer.getB());
+        Assert.assertSame(v, transformer.getV());
 
     }
 

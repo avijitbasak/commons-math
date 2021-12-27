@@ -24,7 +24,7 @@ import org.apache.commons.statistics.distribution.DiscreteDistribution;
 import org.apache.commons.statistics.distribution.NormalDistribution;
 import org.apache.commons.statistics.distribution.ContinuousDistribution;
 import org.apache.commons.statistics.distribution.UniformDiscreteDistribution;
-import org.apache.commons.math4.legacy.core.jdkmath.AccurateMath;
+import org.apache.commons.math4.core.jdkmath.JdkMath;
 import org.apache.commons.rng.simple.RandomSource;
 import org.junit.Assert;
 import org.junit.Test;
@@ -38,7 +38,7 @@ public abstract class UnivariateStatisticAbstractTest {
     protected double geoMean = 12.070589161633011d;
 
     protected double var = 10.00235930735931d;
-    protected double std = AccurateMath.sqrt(var);
+    protected double std = JdkMath.sqrt(var);
     protected double skew = 1.437423729196190d;
     protected double kurt = 2.377191264804700d;
 
@@ -59,7 +59,7 @@ public abstract class UnivariateStatisticAbstractTest {
 
     protected double weightedMean = 12.366995073891626d;
     protected double weightedVar =   9.974760968886391d;
-    protected double weightedStd = AccurateMath.sqrt(weightedVar);
+    protected double weightedStd = JdkMath.sqrt(weightedVar);
     protected double weightedProduct = 8517647448765288000000d;
     protected double weightedSum = 251.05d;
 
@@ -178,7 +178,7 @@ public abstract class UnivariateStatisticAbstractTest {
         // Fill weights array with random int values between 1 and 5
         int[] intWeights = new int[len];
         final DiscreteDistribution.Sampler weightDist =
-            new UniformDiscreteDistribution(1, 5).createSampler(RandomSource.WELL_512_A.create(234878544L));
+            UniformDiscreteDistribution.of(1, 5).createSampler(RandomSource.WELL_512_A.create(234878544L));
         for (int i = 0; i < len; i++) {
             intWeights[i] = weightDist.sample();
             weights[i] = intWeights[i];
@@ -188,7 +188,7 @@ public abstract class UnivariateStatisticAbstractTest {
         // and fill valuesList with values from values array with
         // values[i] repeated weights[i] times, each i
         final ContinuousDistribution.Sampler valueDist =
-            new NormalDistribution(mu, sigma).createSampler(RandomSource.WELL_512_A.create(64925784252L));
+            NormalDistribution.of(mu, sigma).createSampler(RandomSource.WELL_512_A.create(64925784252L));
         List<Double> valuesList = new ArrayList<>();
         for (int i = 0; i < len; i++) {
             double value = valueDist.sample();

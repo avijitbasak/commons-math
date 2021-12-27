@@ -40,48 +40,53 @@ public class BOBYQAOptimizerTest {
 
     @Test(expected=NumberIsTooLargeException.class)
     public void testInitOutOfBounds() {
-        double[] startPoint = OptimTestUtils.point(DIM, 3);
-        double[][] boundaries = boundaries(DIM, -1, 2);
-        doTest(TestFunction.ROSEN.withDimension(DIM), startPoint, boundaries,
+        final int dim = 12;
+        double[] startPoint = OptimTestUtils.point(dim, 3);
+        double[][] boundaries = boundaries(dim, -1, 2);
+        doTest(TestFunction.ROSENBROCK.withDimension(dim), startPoint, boundaries,
                 GoalType.MINIMIZE,
                 1e-13, 1e-6, 2000, null);
     }
 
     @Test(expected=DimensionMismatchException.class)
     public void testBoundariesDimensionMismatch() {
-        double[] startPoint = OptimTestUtils.point(DIM, 0.5);
-        double[][] boundaries = boundaries(DIM + 1, -1, 2);
-        doTest(TestFunction.ROSEN.withDimension(DIM), startPoint, boundaries,
+        final int dim = 12;
+        double[] startPoint = OptimTestUtils.point(dim, 0.5);
+        double[][] boundaries = boundaries(dim + 1, -1, 2);
+        doTest(TestFunction.ROSENBROCK.withDimension(dim), startPoint, boundaries,
                GoalType.MINIMIZE,
                1e-13, 1e-6, 2000, null);
     }
 
     @Test(expected=NumberIsTooSmallException.class)
     public void testProblemDimensionTooSmall() {
+        final int dim = 12;
         double[] startPoint = OptimTestUtils.point(1, 0.5);
-        doTest(TestFunction.ROSEN.withDimension(DIM), startPoint, null,
+        doTest(TestFunction.ROSENBROCK.withDimension(dim), startPoint, null,
                GoalType.MINIMIZE,
                1e-13, 1e-6, 2000, null);
     }
 
     @Test(expected=TooManyEvaluationsException.class)
     public void testMaxEvaluations() {
+        final int dim = 12;
         final int lowMaxEval = 2;
-        double[] startPoint = OptimTestUtils.point(DIM, 0.1);
+        double[] startPoint = OptimTestUtils.point(dim, 0.1);
         double[][] boundaries = null;
-        doTest(TestFunction.ROSEN.withDimension(DIM), startPoint, boundaries,
+        doTest(TestFunction.ROSENBROCK.withDimension(dim), startPoint, boundaries,
                GoalType.MINIMIZE,
                1e-13, 1e-6, lowMaxEval, null);
      }
 
     @Test
     public void testRosen() {
-        double[] startPoint = OptimTestUtils.point(DIM,0.1);
+        final int dim = 12;
+        double[] startPoint = OptimTestUtils.point(dim, 0.1);
         double[][] boundaries = null;
-        PointValuePair expected = new PointValuePair(OptimTestUtils.point(DIM,1.0),0.0);
-        doTest(TestFunction.ROSEN.withDimension(DIM), startPoint, boundaries,
+        PointValuePair expected = new PointValuePair(OptimTestUtils.point(dim, 1.0), 0.0);
+        doTest(TestFunction.ROSENBROCK.withDimension(dim), startPoint, boundaries,
                 GoalType.MINIMIZE,
-                1e-13, 1e-6, 2000, expected);
+                1e-13, 1e-6, 3000, expected);
      }
 
     @Test
@@ -177,27 +182,15 @@ public class BOBYQAOptimizerTest {
     }
 
     @Test
-    public void testDiffPow() {
+    public void testSumPow() {
         final int dim = DIM / 2;
         double[] startPoint = OptimTestUtils.point(dim, 1.0);
         double[][] boundaries = null;
         PointValuePair expected =
             new PointValuePair(OptimTestUtils.point(dim, 0.0), 0.0);
-        doTest(TestFunction.DIFF_POW.withDimension(dim), startPoint, boundaries,
+        doTest(TestFunction.SUM_POW.withDimension(dim), startPoint, boundaries,
                 GoalType.MINIMIZE,
-                1e-8, 1e-1, 21000, expected);
-    }
-
-    @Test
-    public void testSsDiffPow() {
-        final int dim = DIM / 2;
-        double[] startPoint = OptimTestUtils.point(dim, 1.0);
-        double[][] boundaries = null;
-        PointValuePair expected =
-            new PointValuePair(OptimTestUtils.point(dim, 0.0), 0.0);
-        doTest(TestFunction.SS_DIFF_POW.withDimension(dim), startPoint, boundaries,
-                GoalType.MINIMIZE,
-                1e-2, 1.3e-1, 50000, expected);
+                1e-8, 1e-1, 21720, expected);
     }
 
     @Test
@@ -225,14 +218,15 @@ public class BOBYQAOptimizerTest {
 
     @Test
     public void testConstrainedRosen() {
-        double[] startPoint = OptimTestUtils.point(DIM,0.1);
+        final int dim = 12;
+        double[] startPoint = OptimTestUtils.point(dim, 0.1);
 
-        double[][] boundaries = boundaries(DIM,-1,2);
+        double[][] boundaries = boundaries(dim, -1, 2);
         PointValuePair expected =
-            new PointValuePair(OptimTestUtils.point(DIM,1.0),0.0);
-        doTest(TestFunction.ROSEN.withDimension(DIM), startPoint, boundaries,
+            new PointValuePair(OptimTestUtils.point(dim, 1.0), 0.0);
+        doTest(TestFunction.ROSENBROCK.withDimension(dim), startPoint, boundaries,
                 GoalType.MINIMIZE,
-                1e-13, 1e-6, 2000, expected);
+                1e-13, 1e-6, 3000, expected);
     }
 
     // See MATH-728
@@ -240,9 +234,10 @@ public class BOBYQAOptimizerTest {
     //       makes it run for several hours before completing
     @Ignore @Test
     public void testConstrainedRosenWithMoreInterpolationPoints() {
-        final double[] startPoint = OptimTestUtils.point(DIM, 0.1);
-        final double[][] boundaries = boundaries(DIM, -1, 2);
-        final PointValuePair expected = new PointValuePair(OptimTestUtils.point(DIM, 1.0), 0.0);
+        final int dim = 12;
+        final double[] startPoint = OptimTestUtils.point(dim, 0.1);
+        final double[][] boundaries = boundaries(dim, -1, 2);
+        final PointValuePair expected = new PointValuePair(OptimTestUtils.point(dim, 1.0), 0.0);
 
         // This should have been 78 because in the code the hard limit is
         // said to be
@@ -252,7 +247,7 @@ public class BOBYQAOptimizerTest {
         final int maxAdditionalPoints = 47;
 
         for (int num = 1; num <= maxAdditionalPoints; num++) {
-            doTest(TestFunction.ROSEN.withDimension(DIM), startPoint, boundaries,
+            doTest(TestFunction.ROSENBROCK.withDimension(dim), startPoint, boundaries,
                    GoalType.MINIMIZE,
                    1e-12, 1e-6, 2000,
                    num,
