@@ -218,6 +218,18 @@ public class EnumeratedIntegerDistribution extends AbstractIntegerDistribution {
     /**
      * {@inheritDoc}
      *
+     * The support of this distribution is connected.
+     *
+     * @return {@code true}
+     */
+    @Override
+    public boolean isSupportConnected() {
+        return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
      * Refer to {@link EnumeratedDistribution.Sampler} for implementation details.
      */
     @Override

@@ -284,7 +284,7 @@ public final class JdkMath {
             NEXTUP_FLOAT = AccurateMath::nextUp;
             NEXTUP_DOUBLE = AccurateMath::nextUp;
             POW = AccurateMath::pow;
-            RANDOM = Math::random; // Not implemented.
+            RANDOM = AccurateMath::random;
             RINT = AccurateMath::rint;
             ROUND_DOUBLE = AccurateMath::round;
             ROUND_FLOAT = AccurateMath::round;
@@ -292,7 +292,7 @@ public final class JdkMath {
             SCALB_FLOAT = AccurateMath::scalb;
             SIGNUM_DOUBLE = AccurateMath::signum;
             SIGNUM_FLOAT = AccurateMath::signum;
-            SQRT = Math::sqrt; // Not implemented.
+            SQRT = AccurateMath::sqrt;
             SIN = AccurateMath::sin;
             SINH = AccurateMath::sinh;
             SUBTRACTEXACT_INT = AccurateMath::subtractExact;
@@ -398,8 +398,6 @@ public final class JdkMath {
     /**
      * @param x Number.
      * @return abs(x).
-     *
-     * @see Math#abs(int)
      */
     public static int abs(int x) {
         return ABS_INT.applyAsInt(x);
@@ -408,8 +406,6 @@ public final class JdkMath {
     /**
      * @param x Number.
      * @return abs(x).
-     *
-     * @see Math#abs(long)
      */
     public static long abs(long x) {
         return ABS_LONG.applyAsLong(x);
@@ -418,8 +414,6 @@ public final class JdkMath {
     /**
      * @param x Number.
      * @return abs(x).
-     *
-     * @see Math#abs(float)
      */
     public static float abs(float x) {
         return ABS_FLOAT.applyAsFloat(x);
@@ -428,8 +422,6 @@ public final class JdkMath {
     /**
      * @param x Number.
      * @return abs(x).
-     *
-     * @see Math#abs(double)
      */
     public static double abs(double x) {
         return ABS_DOUBLE.applyAsDouble(x);
@@ -438,8 +430,6 @@ public final class JdkMath {
     /**
      * @param x Number.
      * @return acos(x).
-     *
-     * @see Math#acos(double)
      */
     public static double acos(double x) {
         return ACOS.applyAsDouble(x);
@@ -457,8 +447,6 @@ public final class JdkMath {
      * @param x Number.
      * @param y Number.
      * @return addExact(x, y).
-     *
-     * @see Math#addExact(int,int)
      */
     public static int addExact(int x,
                                int y) {
@@ -469,8 +457,6 @@ public final class JdkMath {
      * @param x Number.
      * @param y Number.
      * @return addExact(x, y).
-     *
-     * @see Math#addExact(long,long)
      */
     public static long addExact(long x,
                                 long y) {
@@ -480,8 +466,6 @@ public final class JdkMath {
     /**
      * @param x Number.
      * @return asin(x).
-     *
-     * @see Math#asin(double)
      */
     public static double asin(double x) {
         return ASIN.applyAsDouble(x);
@@ -497,9 +481,7 @@ public final class JdkMath {
 
     /**
      * @param x Number.
-     * @return atan(x).
-     *
-     * @see Math#atan(double)
+     * @return asin(x).
      */
     public static double atan(double x) {
         return ATAN.applyAsDouble(x);
@@ -509,8 +491,6 @@ public final class JdkMath {
      * @param y Number.
      * @param x Number.
      * @return atan2(y, x).
-     *
-     * @see Math#atan2(double,double)
      */
     public static double atan2(double y,
                                double x) {
@@ -528,8 +508,6 @@ public final class JdkMath {
     /**
      * @param x Number.
      * @return cbrt(x).
-     *
-     * @see Math#cbrt(double)
      */
     public static double cbrt(double x) {
         return CBRT.applyAsDouble(x);
@@ -538,8 +516,6 @@ public final class JdkMath {
     /**
      * @param x Number.
      * @return ceil(x).
-     *
-     * @see Math#ceil(double)
      */
     public static double ceil(double x) {
         return CEIL.applyAsDouble(x);
@@ -549,8 +525,6 @@ public final class JdkMath {
      * @param x Number.
      * @param y Number.
      * @return copySign(x, y).
-     *
-     * @see Math#copySign(float,float)
      */
     public static float copySign(float x,
                                  float y) {
@@ -561,8 +535,6 @@ public final class JdkMath {
      * @param x Number.
      * @param y Number.
      * @return copySign(x, y).
-     *
-     * @see Math#copySign(double,double)
      */
     public static double copySign(double x,
                                   double y) {
@@ -572,8 +544,6 @@ public final class JdkMath {
     /**
      * @param x Number.
      * @return cos(x).
-     *
-     * @see Math#cos(double)
      */
     public static double cos(double x) {
         return COS.applyAsDouble(x);
@@ -582,8 +552,6 @@ public final class JdkMath {
     /**
      * @param x Number.
      * @return cosh(x).
-     *
-     * @see Math#cosh(double)
      */
     public static double cosh(double x) {
         return COSH.applyAsDouble(x);
@@ -592,8 +560,6 @@ public final class JdkMath {
     /**
      * @param x Number.
      * @return decrementExact(x).
-     *
-     * @see Math#decrementExact(int)
      */
     public static int decrementExact(int x) {
         return DECREMENTEXACT_INT.applyAsInt(x);
@@ -602,8 +568,6 @@ public final class JdkMath {
     /**
      * @param x Number.
      * @return decrementExact(x).
-     *
-     * @see Math#decrementExact(long)
      */
     public static long decrementExact(long x) {
         return DECREMENTEXACT_LONG.applyAsLong(x);
@@ -612,8 +576,6 @@ public final class JdkMath {
     /**
      * @param x Number.
      * @return exp(x).
-     *
-     * @see Math#exp(double)
      */
     public static double exp(double x) {
         return EXP.applyAsDouble(x);
@@ -622,8 +584,6 @@ public final class JdkMath {
     /**
      * @param x Number.
      * @return expm1(x).
-     *
-     * @see Math#expm1(double)
      */
     public static double expm1(double x) {
         return EXPM1.applyAsDouble(x);
@@ -632,8 +592,6 @@ public final class JdkMath {
     /**
      * @param x Number.
      * @return floor(x).
-     *
-     * @see Math#floor(double)
      */
     public static double floor(double x) {
         return FLOOR.applyAsDouble(x);
@@ -643,8 +601,6 @@ public final class JdkMath {
      * @param x Number.
      * @param y Number.
      * @return floorDiv(x, y).
-     *
-     * @see Math#floorDiv(int,int)
      */
     public static int floorDiv(int x,
                                int y) {
@@ -655,8 +611,6 @@ public final class JdkMath {
      * @param x Number.
      * @param y Number.
      * @return floorDiv(x, y).
-     *
-     * @see Math#floorDiv(long,long)
      */
     public static long floorDiv(long x,
                                 long y) {
@@ -667,8 +621,6 @@ public final class JdkMath {
      * @param x Number.
      * @param y Number.
      * @return floorMod(x, y).
-     *
-     * @see Math#floorMod(int,int)
      */
     public static int floorMod(int x,
                                int y) {
@@ -679,8 +631,6 @@ public final class JdkMath {
      * @param x Number.
      * @param y Number.
      * @return floorMod(x, y).
-     *
-     * @see Math#floorMod(long,long)
      */
     public static long floorMod(long x,
                                 long y) {
@@ -690,8 +640,6 @@ public final class JdkMath {
     /**
      * @param x Number.
      * @return getExponent(x).
-     *
-     * @see Math#getExponent(float)
      */
     public static int getExponent(float x) {
         return GETEXPONENT_FLOAT.applyAsInt(x);
@@ -700,8 +648,6 @@ public final class JdkMath {
     /**
      * @param x Number.
      * @return getExponent(x).
-     *
-     * @see Math#getExponent(double)
      */
     public static int getExponent(double x) {
         return GETEXPONENT_DOUBLE.applyAsInt(x);
@@ -711,8 +657,6 @@ public final class JdkMath {
      * @param x Number.
      * @param y Number.
      * @return hypot(x, y).
-     *
-     * @see Math#hypot(double,double)
      */
     public static double hypot(double x,
                                double y) {
@@ -723,8 +667,6 @@ public final class JdkMath {
      * @param x Number.
      * @param y Number.
      * @return IEEEremainder(x, y).
-     *
-     * @see Math#IEEEremainder(double,double)
      */
     public static double IEEEremainder(double x,
                                        double y) {
@@ -734,8 +676,6 @@ public final class JdkMath {
     /**
      * @param x Number.
      * @return incrementExact(x).
-     *
-     * @see Math#incrementExact(int)
      */
     public static int incrementExact(int x) {
         return INCREMENTEXACT_INT.applyAsInt(x);
@@ -744,8 +684,6 @@ public final class JdkMath {
     /**
      * @param x Number.
      * @return incrementExact(x).
-     *
-     * @see Math#incrementExact(long)
      */
     public static long incrementExact(long x) {
         return INCREMENTEXACT_LONG.applyAsLong(x);
@@ -754,8 +692,6 @@ public final class JdkMath {
     /**
      * @param x Number.
      * @return log(x).
-     *
-     * @see Math#log(double)
      */
     public static double log(double x) {
         return LOG.applyAsDouble(x);
@@ -764,8 +700,6 @@ public final class JdkMath {
     /**
      * @param x Number.
      * @return log10(x).
-     *
-     * @see Math#log10(double)
      */
     public static double log10(double x) {
         return LOG10.applyAsDouble(x);
@@ -774,8 +708,6 @@ public final class JdkMath {
     /**
      * @param x Number.
      * @return log1p(x).
-     *
-     * @see Math#log1p(double)
      */
     public static double log1p(double x) {
         return LOG1P.applyAsDouble(x);
@@ -785,8 +717,6 @@ public final class JdkMath {
      * @param x Number.
      * @param y Number.
      * @return max(x, y).
-     *
-     * @see Math#max(int,int)
      */
     public static int max(int x,
                           int y) {
@@ -797,8 +727,6 @@ public final class JdkMath {
      * @param x Number.
      * @param y Number.
      * @return max(x, y).
-     *
-     * @see Math#max(long,long)
      */
     public static long max(long x,
                            long y) {
@@ -809,8 +737,6 @@ public final class JdkMath {
      * @param x Number.
      * @param y Number.
      * @return max(x, y).
-     *
-     * @see Math#max(float,float)
      */
     public static float max(float x,
                             float y) {
@@ -821,8 +747,6 @@ public final class JdkMath {
      * @param x Number.
      * @param y Number.
      * @return max(x, y).
-     *
-     * @see Math#max(double,double)
      */
     public static double max(double x,
                              double y) {
@@ -833,8 +757,6 @@ public final class JdkMath {
      * @param x Number.
      * @param y Number.
      * @return min(x, y).
-     *
-     * @see Math#min(int,int)
      */
     public static int min(int x,
                           int y) {
@@ -845,8 +767,6 @@ public final class JdkMath {
      * @param x Number.
      * @param y Number.
      * @return min(x, y).
-     *
-     * @see Math#min(long,long)
      */
     public static long min(long x,
                            long y) {
@@ -857,8 +777,6 @@ public final class JdkMath {
      * @param x Number.
      * @param y Number.
      * @return min(x, y).
-     *
-     * @see Math#min(float,float)
      */
     public static float min(float x,
                             float y) {
@@ -869,8 +787,6 @@ public final class JdkMath {
      * @param x Number.
      * @param y Number.
      * @return min(x, y).
-     *
-     * @see Math#min(double,double)
      */
     public static double min(double x,
                              double y) {
@@ -881,8 +797,6 @@ public final class JdkMath {
      * @param x Number.
      * @param y Number.
      * @return multiplyExact(x, y).
-     *
-     * @see Math#multiplyExact(int,int)
      */
     public static int multiplyExact(int x,
                                     int y) {
@@ -893,8 +807,6 @@ public final class JdkMath {
      * @param x Number.
      * @param y Number.
      * @return multiplyExact(x, y).
-     *
-     * @see Math#multiplyExact(long,long)
      */
     public static long multiplyExact(long x,
                                      long y) {
@@ -904,8 +816,6 @@ public final class JdkMath {
     /**
      * @param x Number.
      * @return negateExact(x).
-     *
-     * @see Math#negateExact(int)
      */
     public static int negateExact(int x) {
         return NEGATEEXACT_INT.applyAsInt(x);
@@ -914,8 +824,6 @@ public final class JdkMath {
     /**
      * @param x Number.
      * @return negateExact(x).
-     *
-     * @see Math#negateExact(long)
      */
     public static long negateExact(long x) {
         return NEGATEEXACT_LONG.applyAsLong(x);
@@ -925,8 +833,6 @@ public final class JdkMath {
      * @param x Number.
      * @param y Number.
      * @return nextAfter(x, y).
-     *
-     * @see Math#nextAfter(double, double)
      */
     public static double nextAfter(double x,
                                    double y) {
@@ -937,8 +843,6 @@ public final class JdkMath {
      * @param x Number.
      * @param y Number.
      * @return nextAfter(x, y).
-     *
-     * @see Math#nextAfter(float,double)
      */
     public static float nextAfter(float x,
                                   double y) {
@@ -948,8 +852,6 @@ public final class JdkMath {
     /**
      * @param x Number.
      * @return nextDown(x).
-     *
-     * @see Math#nextDown(double)
      */
     public static double nextDown(double x) {
         return NEXTDOWN_DOUBLE.applyAsDouble(x);
@@ -958,8 +860,6 @@ public final class JdkMath {
     /**
      * @param x Number.
      * @return nextDown(x).
-     *
-     * @see Math#nextDown(float)
      */
     public static float nextDown(float x) {
         return NEXTDOWN_FLOAT.applyAsFloat(x);
@@ -968,8 +868,6 @@ public final class JdkMath {
     /**
      * @param x Number.
      * @return nextUp(x).
-     *
-     * @see Math#nextUp(double)
      */
     public static double nextUp(double x) {
         return NEXTUP_DOUBLE.applyAsDouble(x);
@@ -978,8 +876,6 @@ public final class JdkMath {
     /**
      * @param x Number.
      * @return nextUp(x).
-     *
-     * @see Math#nextUp(float)
      */
     public static float nextUp(float x) {
         return NEXTUP_FLOAT.applyAsFloat(x);
@@ -989,8 +885,6 @@ public final class JdkMath {
      * @param x Number.
      * @param y Number.
      * @return pow(x, y).
-     *
-     * @see Math#pow(double,double)
      */
     public static double pow(double x,
                              double y) {
@@ -999,8 +893,6 @@ public final class JdkMath {
 
     /**
      * @return a random number between 0 and 1.
-     *
-     * @see Math#random()
      */
     public static double random() {
         return RANDOM.getAsDouble();
@@ -1009,8 +901,6 @@ public final class JdkMath {
     /**
      * @param x Number.
      * @return rint(x).
-     *
-     * @see Math#rint(double)
      */
     public static double rint(double x) {
         return RINT.applyAsDouble(x);
@@ -1019,8 +909,6 @@ public final class JdkMath {
     /**
      * @param x Number.
      * @return round(x).
-     *
-     * @see Math#round(float)
      */
     public static int round(float x) {
         return ROUND_FLOAT.applyAsInt(x);
@@ -1029,8 +917,6 @@ public final class JdkMath {
     /**
      * @param x Number.
      * @return round(x).
-     *
-     * @see Math#round(double)
      */
     public static long round(double x) {
         return ROUND_DOUBLE.applyAsLong(x);
@@ -1040,8 +926,6 @@ public final class JdkMath {
      * @param x Number.
      * @param y Number.
      * @return scalb(x, y).
-     *
-     * @see Math#scalb(double,int)
      */
     public static double scalb(double x,
                                int y) {
@@ -1052,8 +936,6 @@ public final class JdkMath {
      * @param x Number.
      * @param y Number.
      * @return scalb(x, y).
-     *
-     * @see Math#scalb(float,int)
      */
     public static float scalb(float x,
                               int y) {
@@ -1063,8 +945,6 @@ public final class JdkMath {
     /**
      * @param x Number.
      * @return signum(x).
-     *
-     * @see Math#signum(double)
      */
     public static double signum(double x) {
         return SIGNUM_DOUBLE.applyAsDouble(x);
@@ -1073,8 +953,6 @@ public final class JdkMath {
     /**
      * @param x Number.
      * @return signum(x).
-     *
-     * @see Math#signum(float)
      */
     public static float signum(float x) {
         return SIGNUM_FLOAT.applyAsFloat(x);
@@ -1083,8 +961,6 @@ public final class JdkMath {
     /**
      * @param x Number.
      * @return sin(x).
-     *
-     * @see Math#sin(double)
      */
     public static double sin(double x) {
         return SIN.applyAsDouble(x);
@@ -1093,8 +969,6 @@ public final class JdkMath {
     /**
      * @param x Number.
      * @return sinh(x).
-     *
-     * @see Math#sinh(double)
      */
     public static double sinh(double x) {
         return SINH.applyAsDouble(x);
@@ -1103,8 +977,6 @@ public final class JdkMath {
     /**
      * @param x Number.
      * @return sqrt(x).
-     *
-     * @see Math#sqrt(double)
      */
     public static double sqrt(double x) {
         return SQRT.applyAsDouble(x);
@@ -1114,8 +986,6 @@ public final class JdkMath {
      * @param x Number.
      * @param y Number.
      * @return subtractExact(x, y).
-     *
-     * @see Math#subtractExact(int,int)
      */
     public static int subtractExact(int x,
                                     int y) {
@@ -1126,8 +996,6 @@ public final class JdkMath {
      * @param x Number.
      * @param y Number.
      * @return subtractExact(x, y).
-     *
-     * @see Math#subtractExact(long,long)
      */
     public static long subtractExact(long x,
                                      long y) {
@@ -1137,8 +1005,6 @@ public final class JdkMath {
     /**
      * @param x Number.
      * @return tan(x).
-     *
-     * @see Math#tan(double)
      */
     public static double tan(double x) {
         return TAN.applyAsDouble(x);
@@ -1147,8 +1013,6 @@ public final class JdkMath {
     /**
      * @param x Number.
      * @return tanh(x).
-     *
-     * @see Math#tanh(double)
      */
     public static double tanh(double x) {
         return TANH.applyAsDouble(x);
@@ -1157,8 +1021,6 @@ public final class JdkMath {
     /**
      * @param x Number.
      * @return toDegrees(x).
-     *
-     * @see Math#toDegrees(double)
      */
     public static double toDegrees(double x) {
         return TODEGREES.applyAsDouble(x);
@@ -1167,8 +1029,6 @@ public final class JdkMath {
     /**
      * @param x Number.
      * @return toIntExact(x).
-     *
-     * @see Math#toIntExact(long)
      */
     public static int toIntExact(long x) {
         return TOINTEXACT.applyAsInt(x);
@@ -1177,8 +1037,6 @@ public final class JdkMath {
     /**
      * @param x Number.
      * @return toRadians(x).
-     *
-     * @see Math#toRadians(double)
      */
     public static double toRadians(double x) {
         return TORADIANS.applyAsDouble(x);
@@ -1187,8 +1045,6 @@ public final class JdkMath {
     /**
      * @param x Number.
      * @return ulp(x).
-     *
-     * @see Math#ulp(double)
      */
     public static double ulp(double x) {
         return ULP_DOUBLE.applyAsDouble(x);
@@ -1197,8 +1053,6 @@ public final class JdkMath {
     /**
      * @param x Number.
      * @return ulp(x).
-     *
-     * @see Math#ulp(float)
      */
     public static float ulp(float x) {
         return ULP_FLOAT.applyAsFloat(x);
